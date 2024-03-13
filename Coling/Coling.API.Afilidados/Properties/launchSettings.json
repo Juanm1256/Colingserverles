@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Coling.API.Afilidados": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7102",
+      "environmentVariables": {
+        "cadenaConexion": "Data Source=.;Initial Catalog=colingbd;Integrated Security=True;Trust Server Certificate=True"
+      }
+    }
+  }
+}
