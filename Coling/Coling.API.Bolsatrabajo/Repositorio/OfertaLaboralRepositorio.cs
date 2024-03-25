@@ -1,5 +1,7 @@
 ﻿using Coling.API.Bolsatrabajo.Contratos.Repositorio;
 using Coling.API.Bolsatrabajo.Modelo;
+using Coling.Shared;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Extensions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -53,11 +55,7 @@ namespace Coling.API.Bolsatrabajo.Repositorio
         {
             List<OfertaLaboral> lista = new List<OfertaLaboral>();
 
-            var filter = Builders<OfertaLaboral>.Filter.Empty; // Filtro vacío para obtener todos los documentos
-
-            var cursor = await collection.FindAsync(filter);
-            await cursor.ForEachAsync(doc => lista.Add(doc));
-
+            lista = await collection.Find(d => true).ToListAsync();
             return lista;
 
         }
@@ -101,11 +99,28 @@ namespace Coling.API.Bolsatrabajo.Repositorio
         {
             try
             {
+                bool sw = false;
                 ObjectId objectId;
                 if (ObjectId.TryParse(id, out objectId))
                 {
-                    var result = await collection.ReplaceOneAsync(Builders<OfertaLaboral>.Filter.Eq("_id", objectId), ofertaLaboral);
-                    return result.ModifiedCount == 1;
+                    OfertaLaboral modificar = await collection.Find(Builders<OfertaLaboral>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
+                    if (modificar != null)
+                    {
+                        modificar.tipoinstitucion = ofertaLaboral.tipoinstitucion;
+                        modificar.FechaOferta = ofertaLaboral.FechaOferta;
+                        modificar.FechaLimite = ofertaLaboral.FechaLimite;
+                        modificar.Descripcion = ofertaLaboral.Descripcion;
+                        modificar.TituloCargo = ofertaLaboral.TituloCargo;
+                        modificar.TipoContrato = ofertaLaboral.TipoContrato;
+                        modificar.TipoTrabajo = ofertaLaboral.TipoTrabajo;
+                        modificar.Area = ofertaLaboral.Area;
+                        modificar.Caracteristicas = ofertaLaboral.Caracteristicas;
+                        modificar.Estado = ofertaLaboral.Estado;
+
+                        await collection.ReplaceOneAsync(Builders<OfertaLaboral>.Filter.Eq("_id", objectId), modificar);
+                        sw = true;
+                    }
+                    return sw;
                 }
                 else
                 {
