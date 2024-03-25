@@ -78,8 +78,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID de la oferta laboral", Description = "El ID de la oferta laboral a modificar.")]
 
         public async Task<HttpResponseData> ModificarOfertaLaboral(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "ModificarOfertaLaboral/{id}")] HttpRequestData req,
-            string id)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "modificarOfertaLaboral/{id}")] HttpRequestData req, string id)
         {
             try
             {
@@ -109,7 +108,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la oferta Laboral a eliminar")]
 
         public async Task<HttpResponseData> EliminarOfertaLaboral(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "EliminarOferta/{partitionkey}/{id}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "EliminarOferta/{id}")] HttpRequestData req,
             string id)
         {
             try

@@ -54,11 +54,7 @@ namespace Coling.API.Bolsatrabajo.Repositorio
         {
             List<Solicitud> lista = new List<Solicitud>();
 
-            var filter = Builders<Solicitud>.Filter.Empty; // Filtro vacío para obtener todos los documentos
-
-            var cursor = await collection.FindAsync(filter);
-            await cursor.ForEachAsync(doc => lista.Add(doc));
-
+            lista = await collection.Find(d => true).ToListAsync();
             return lista;
         }
 
@@ -105,8 +101,21 @@ namespace Coling.API.Bolsatrabajo.Repositorio
                 ObjectId objectId;
                 if (ObjectId.TryParse(id, out objectId))
                 {
-                    var result = await collection.ReplaceOneAsync(Builders<Solicitud>.Filter.Eq("_id", objectId), solicitud);
-                    return result.ModifiedCount == 1;
+                    bool sw = false;
+                    Solicitud modificar = await collection.Find(Builders<Solicitud>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
+                    if (modificar != null)
+                    {
+                        modificar.Afiliado = solicitud.Afiliado;
+                        modificar.NombreCompleto = solicitud.NombreCompleto;
+                        modificar.FechaPostulacion = solicitud.FechaPostulacion;
+                        modificar.PretencionSalarial = solicitud.PretencionSalarial;
+                        modificar.Acercade = solicitud.Acercade;
+                        modificar.Oferta = solicitud.Oferta;
+
+                        await collection.ReplaceOneAsync(Builders<Solicitud>.Filter.Eq("_id", objectId), modificar);
+                        sw = true;
+                    }
+                    return sw;
                 }
                 else
                 {
