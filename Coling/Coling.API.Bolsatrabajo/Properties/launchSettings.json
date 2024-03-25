@@ -3,7 +3,9 @@
     "Coling.API.Bolsatrabajo": {
       "commandName": "Project",
       "commandLineArgs": "--port 7237",
-      "launchBrowser": false
+      "environmentVariables": {
+        "ClaveConexion": "mongodb+srv://JuanMa1256:SbJTWd0QmBhTg8DT@tareabd.nsmkkzj.mongodb.net/?retryWrites=true&w=majority&appName=TareaBD"
+      }
     }
   }
 }

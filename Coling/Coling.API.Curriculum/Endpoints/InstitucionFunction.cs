@@ -1,7 +1,9 @@
 using Coling.API.Curriculum.Contrato.Repositorios;
 using Coling.API.Curriculum.Modelo;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
@@ -19,6 +21,9 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarInstitucion")]
+        [OpenApiOperation("Insertarspec", "InsertarInstitucion", Description = " Sirve para listar todas las instituciones")]
+        [OpenApiRequestBody("application/json", typeof(Institucion), Description = "Institucion modelo")]
+        [OpenApiResponseWithBody(statusCode:HttpStatusCode.OK, contentType:"application/json", bodyType: typeof(Institucion), Description = "Insertara la institicon.")]
         public async Task<HttpResponseData> InsertarInstitucion([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             try
@@ -47,6 +52,8 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarInstitucion")]
+        [OpenApiOperation("Listarspec","ListarInstitucion", Description = " Sirve para listar todas las instituciones")]
+        [OpenApiResponseWithBody(statusCode:HttpStatusCode.OK, contentType:"application/json", bodyType: typeof(List<Institucion>), Description = "Mostrar una lista de instituciones")]
         public async Task<HttpResponseData> ListarInstitucion([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
             try

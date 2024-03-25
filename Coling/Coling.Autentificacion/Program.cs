@@ -1,17 +1,16 @@
-using Coling.API.Bolsatrabajo.Contratos.Repositorio;
-using Coling.API.Bolsatrabajo.Repositorio;
+using Coling.Repositorio.Contratos;
+using Coling.Repositorio.Implementacion;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddScoped<IOfertaLaboralLogic, OfertaLaboralRepositorio>();
-        services.AddScoped<ISolicitudLogic, SolicitudRepositorio>();
+        services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
     })
     .Build();
 
