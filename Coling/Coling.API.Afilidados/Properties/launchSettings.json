@@ -4,7 +4,8 @@
       "commandName": "Project",
       "commandLineArgs": "--port 7102",
       "environmentVariables": {
-        "cadenaConexion": "Data Source=.;Initial Catalog=colingbd;Integrated Security=True;Trust Server Certificate=True"
+        "cadenaConexion": "Data Source=.;Initial Catalog=colingbd;Integrated Security=True;Trust Server Certificate=True",
+        "llaveSecreta": "asdfse6f84sd6f84es84fs6a84ef8se4f6a8se4fA6F84S6E8F4SD54F684EF68S4F684FE684SF6A84e46fs4df68s4ef6s84f6sa84ef6s8e4fA6S8E4F6S84EF68F4"
       }
     }
   }
