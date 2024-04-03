@@ -31,7 +31,7 @@ namespace Coling.Autentificacion
         {
             HttpResponseData? respuesta = null;
             var login = await req.ReadFromJsonAsync<Credenciales>() ?? throw new ValidationException("Sus credenciales deben ser completas");
-            var tokenFinal = await usuarioRepositorio.VerificarCredenciales(login.UserName, login.Password);
+            var tokenFinal = await usuarioRepositorio.VerficarCredenciales(login.UserName, login.Password);
             if (tokenFinal!=null)
             {
                 respuesta = req.CreateResponse(HttpStatusCode.OK);

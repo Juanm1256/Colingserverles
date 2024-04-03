@@ -1,0 +1,44 @@
+﻿@page "/instituciones"
+
+
+@inject IInstitucionService servicioinstitucion
+
+
+<h3>Listar Instituciones</h3>
+
+<div class="form-group row">
+    <div class="col-sm-10">
+        <a href="/institucion/crear" class="btn btn-primary m-1">CREAR INSTITUCION</a>
+    </div>
+</div>
+
+.<div>
+    .<table class="table">
+        <thead>
+            <tr>
+                <th><strong>Nombre Institucion</strong></th>
+                <th><strong>Direccion</strong></th>
+            </tr>
+        </thead>
+        @foreach (var item in InstitucionLista)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Direccion</td>
+                <td><a href="/institucion/modificar/@item.RowKey" class="btn btn-primary m-1">Modificar</a></td>
+                <td><a href="/institucion/eliminar" class="btn btn-primary m-1">Eliminar</a></td>
+            </tr>
+        }
+    </table>
+</div>
+
+@code {
+    public List<Institucion> InstitucionLista { get; set; } = new List<Institucion>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTA5ODczfQ.OtyhUJe7PlTzne4fi2rwAFiSiW0X9AIdYb-mIcmpNvw";
+        var respuesta = await servicioinstitucion.ListarInstitucion(token);
+        InstitucionLista = respuesta;
+    }
+}
