@@ -1,5 +1,6 @@
 using Coling.API.Curriculum.Contrato.Repositorios;
 using Coling.API.Curriculum.Modelo;
+using Coling.Shared;
 using Coling.Utilitarios.Attributes;
 using Coling.Utilitarios.Roles;
 using Microsoft.AspNetCore.Http;
@@ -57,7 +58,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
         [Function("ListarInstitucion")]
         [ColingAuthorize(AplicacionRoles.Admin+","+AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
-        [OpenApiOperation("Listarspec","ListarInstitucion", Description = " Sirve para listar todas las instituciones")]
+        [OpenApiOperation("Listarspec", "Institucion", Description = " Sirve para listar todas las instituciones")]
         [OpenApiResponseWithBody(statusCode:HttpStatusCode.OK, contentType:"application/json", bodyType: typeof(List<Institucion>), Description = "Mostrar una lista de instituciones")]
         public async Task<HttpResponseData> ListarInstitucion([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
@@ -83,7 +84,7 @@ namespace Coling.API.Curriculum.Endpoints
         [OpenApiOperation("eliminarInstitucion", "Institucion")]
         [OpenApiParameter("rowkey", In =ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Institucion), Description = "Insertara la institicon.")]
-        public async Task<HttpResponseData> EliminarInstitucion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "eliminarInstitucion/{rowkey}")] HttpRequestData req, string rowkey)
+        public async Task<HttpResponseData> EliminarInstitucion([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarInstitucion/{rowkey}")] HttpRequestData req, string rowkey)
         {
             try
             {
@@ -103,14 +104,14 @@ namespace Coling.API.Curriculum.Endpoints
 
         [Function("ObtenerInstitucion")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("obtenerInstitucion", "Institucion")]
-        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Institucion), Description = "Insertara la institicon.")]
-        public async Task<HttpResponseData> ObtenerInstitucion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerInstitucion/{id}")] HttpRequestData req, string id)
+        [OpenApiOperation("obtenerInstitucion", "Institucion", Description = "Obtener Institucion")]
+        [OpenApiParameter(name: "rowkey", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Institucion), Description = "Obtenecion")]
+        public async Task<HttpResponseData> ObtenerInstitucion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerInstitucion/{rowkey}")] HttpRequestData req, string rowkey)
         {
             try
             {
-                var lista = repos.Get(id);
+                var lista = repos.Get(rowkey);
                 var respuest = req.CreateResponse(HttpStatusCode.OK);
                 await respuest.WriteAsJsonAsync(lista.Result);
                 return respuest;
@@ -129,7 +130,7 @@ namespace Coling.API.Curriculum.Endpoints
         [OpenApiOperation("modificarInstitucion", "Institucion")]
         [OpenApiRequestBody("application/json", typeof(Institucion), Description = "Institucion modelo")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Institucion), Description = "Insertara la institicon.")]
-        public async Task<HttpResponseData> ModificarInstitucion([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        public async Task<HttpResponseData> ModificarInstitucion([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequestData req)
         {
             try
             {

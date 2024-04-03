@@ -67,7 +67,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> EliminarInstitucion(string idInstitucion, string token)
         {
             bool sw = false;
-            endPoint = url + $"/api/EliminarInstitucion/{idInstitucion}";
+            endPoint = url + $"/api/eliminarInstitucion/{idInstitucion}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage respuesta = await client.DeleteAsync(endPoint);
             if (respuesta.IsSuccessStatusCode)
@@ -77,10 +77,9 @@ namespace Coling.Vista.Servicios.Curriculum
             return sw;
         }
 
-        public async Task<Institucion> ObtenerInstitucionPorId(string id, string token)
+        public async Task<Institucion> ObtenerInstitucionPorId(string rowkey, string token)
         {
-            endPoint = $"/api/obtenerInstitucion/{id}";
-            client.BaseAddress = new Uri(url);
+            endPoint = url + $"/api/obtenerInstitucion/{rowkey}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage response = await client.GetAsync(endPoint);

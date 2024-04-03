@@ -1,4 +1,4 @@
-﻿@page "/institucion/modificar/{id}"
+﻿@page "/institucion/modificar/{rowkey}"
 
 @inject IInstitucionService servicioInstitucion
 @inject NavigationManager nav
@@ -20,19 +20,18 @@ else
     private InstitucionFormulario? insform;
 
     [Parameter]
-    public string id { get; set; }
+    public string rowkey { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTA5ODczfQ.OtyhUJe7PlTzne4fi2rwAFiSiW0X9AIdYb-mIcmpNvw";
-        string idInstitucion = id;
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
+        string idInstitucion = rowkey;
         institucion = await servicioInstitucion.ObtenerInstitucionPorId(idInstitucion, token);
     }
 
     private async Task Modificar()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTA5ODczfQ.OtyhUJe7PlTzne4fi2rwAFiSiW0X9AIdYb-mIcmpNvw"; // Obtener el token de autenticación
-        institucion.PartitionKey = "Educacion";
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4"; // Obtener el token de autenticación
         var respuesta = await servicioInstitucion.ModificarInstitucion(institucion, token);
         if (!respuesta)
         {

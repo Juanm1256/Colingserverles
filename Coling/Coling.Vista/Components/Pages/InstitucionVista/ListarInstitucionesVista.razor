@@ -2,6 +2,7 @@
 
 
 @inject IInstitucionService servicioinstitucion
+@inject NavigationManager nav
 
 
 <h3>Listar Instituciones</h3>
@@ -26,7 +27,7 @@
                 <td>@item.Nombre</td>
                 <td>@item.Direccion</td>
                 <td><a href="/institucion/modificar/@item.RowKey" class="btn btn-primary m-1">Modificar</a></td>
-                <td><a href="/institucion/eliminar" class="btn btn-primary m-1">Eliminar</a></td>
+                <td><button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button></td>
             </tr>
         }
     </table>
@@ -37,8 +38,27 @@
 
     protected override async Task OnInitializedAsync()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTA5ODczfQ.OtyhUJe7PlTzne4fi2rwAFiSiW0X9AIdYb-mIcmpNvw";
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
         var respuesta = await servicioinstitucion.ListarInstitucion(token);
         InstitucionLista = respuesta;
+    }
+
+    public async void EliminarInstitucion(string RK)
+    {
+        /*
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¿Deseas borrar este registro de institución?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrarlo!",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (!result.IsConfirmed) return;*/
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
+        var respuesta = await servicioinstitucion.EliminarInstitucion(RK, token);
+        if (respuesta) { nav.NavigateTo("/instituciones", forceLoad: true); }
     }
 }

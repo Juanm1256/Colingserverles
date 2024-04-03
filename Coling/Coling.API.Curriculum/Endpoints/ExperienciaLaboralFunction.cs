@@ -1,8 +1,12 @@
 using Coling.API.Curriculum.Contrato.Repositorios;
 using Coling.API.Curriculum.Modelo;
+using Coling.Utilitarios.Attributes;
+using Coling.Utilitarios.Roles;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 namespace Coling.API.Curriculum.Endpoints
@@ -19,6 +23,10 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarExperienciaLaboral")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("insetarspec", "ExperienciaLaboral")]
+        [OpenApiRequestBody("application/json", typeof(ExperienciaLaboral))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
         public async Task<HttpResponseData> InsertarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             try
@@ -47,6 +55,9 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarExperienciaLaboral")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("Listarspec", "ExperienciaLaboral")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
         public async Task<HttpResponseData> ListarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
             try
@@ -67,7 +78,11 @@ namespace Coling.API.Curriculum.Endpoints
 
         /*tarea para ahora*/
         [Function("EliminarExperienciaLaboral")]
-        public async Task<HttpResponseData> EliminarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req, string partitionkey, string rowkey)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("modificarspec", "ExperienciaLaboral")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
+        public async Task<HttpResponseData> EliminarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "delete", Route ="modificarExperiencia/{id}")] HttpRequestData req, string partitionkey, string rowkey)
         {
             try
             {
@@ -86,7 +101,11 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ObtenerExperienciaLaboral")]
-        public async Task<HttpResponseData> ObtenerExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req, string id)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("obtenerspec", "ExperienciaLaboral")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
+        public async Task<HttpResponseData> ObtenerExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerExperiencia/{id}")] HttpRequestData req, string id)
         {
             try
             {
@@ -105,7 +124,11 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ModificarExperienciaLaboral")]
-        public async Task<HttpResponseData> ModificarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("modificarspec", "ExperienciaLaboral")]
+        [OpenApiRequestBody("application/json", typeof(ExperienciaLaboral))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
+        public async Task<HttpResponseData> ModificarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequestData req)
         {
             try
             {
