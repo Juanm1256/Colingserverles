@@ -3,6 +3,7 @@ using Coling.API.Afilidados.Contratos;
 using Coling.API.Afilidados.Implementaciones;
 using Coling.Utilitarios.Middleware;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
+    //.ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
     {
         var configuration = new ConfigurationBuilder()
@@ -29,6 +30,10 @@ var host = new HostBuilder()
         services.AddScoped<IPersonatiposocial, PersonaTipoSocialLogic>();
         services.AddScoped<IAfiliadoLogic, AfiliadoLogic>();
         services.AddScoped<IProfesionAfiliado, ProfesionAfiliadoLogic>();
+        services.Configure<KestrelServerOptions>(options =>
+        {
+            options.AllowSynchronousIO = true;
+        });
 
     }).ConfigureFunctionsWebApplication(x =>
     {

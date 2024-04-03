@@ -1,0 +1,64 @@
+﻿@page "/instituciones"
+
+
+@inject IInstitucionService servicioinstitucion
+@inject NavigationManager nav
+
+
+<h3>Listar Instituciones</h3>
+
+<div class="form-group row">
+    <div class="col-sm-10">
+        <a href="/institucion/crear" class="btn btn-primary m-1">CREAR INSTITUCION</a>
+    </div>
+</div>
+
+.<div>
+    .<table class="table">
+        <thead>
+            <tr>
+                <th><strong>Nombre Institucion</strong></th>
+                <th><strong>Direccion</strong></th>
+            </tr>
+        </thead>
+        @foreach (var item in InstitucionLista)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Direccion</td>
+                <td><a href="/institucion/modificar/@item.RowKey" class="btn btn-primary m-1">Modificar</a></td>
+                <td><button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button></td>
+            </tr>
+        }
+    </table>
+</div>
+
+@code {
+    public List<Institucion> InstitucionLista { get; set; } = new List<Institucion>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
+        var respuesta = await servicioinstitucion.ListarInstitucion(token);
+        InstitucionLista = respuesta;
+    }
+
+    public async void EliminarInstitucion(string RK)
+    {
+        /*
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¿Deseas borrar este registro de institución?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrarlo!",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (!result.IsConfirmed) return;*/
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
+        var respuesta = await servicioinstitucion.EliminarInstitucion(RK, token);
+        if (respuesta) { nav.NavigateTo("/instituciones", forceLoad: true); }
+    }
+}

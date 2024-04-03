@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Coling.Vista.Servicios.Afiliados;
+using Coling.Vista.Servicios.Curriculum;
+using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.Extensions.Logging;
 
 namespace Coling.Vista
 {
@@ -13,11 +16,14 @@ namespace Coling.Vista
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-
+            builder.Services.AddSweetAlert2();
+            builder.Services.AddHttpClient();
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<IPersonaService, PersonaService>();
+            builder.Services.AddScoped<IInstitucionService, IntitucionServices>();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 

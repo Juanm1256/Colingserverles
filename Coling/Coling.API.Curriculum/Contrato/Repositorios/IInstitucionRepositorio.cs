@@ -12,7 +12,7 @@ namespace Coling.API.Curriculum.Contrato.Repositorios
     {
         public Task<bool> Insertar(Institucion institucion);
         public Task<bool> UpdateIns(Institucion institucion);
-        public Task<bool> Delete(string partitionkey, string rowkey);
+        public Task<bool> Delete(string rowkey);
         public Task<List<Institucion>> Getall();
         public Task<Institucion> Get(string id);
     }

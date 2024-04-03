@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -22,43 +23,37 @@ namespace Coling.Repositorio.Implementacion
         {
             this.configuration = configuration;
         }
-        public async Task<TokenData> ConstruirToken(string usuarioanme, string password)
+        public async Task<TokenData> ConstruirToken(string usuarioname, string password, string rol)
         {
             var claims = new List<Claim>()
             {
-                new Claim("usuario", usuarioanme),
-                new Claim("rol", "Admin"),
+                new Claim("usuario", usuarioname),
+                new Claim("rol", rol),
                 new Claim("estado", "Activo")
             };
 
-            var Secretkey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration["llaveSecreta"]?? ""));
-            var creds = new SigningCredentials(Secretkey, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddMinutes(5);
+            var SecretKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration["LlaveSecreta"] ?? ""));
+            var creds = new SigningCredentials(SecretKey, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddMinutes(120);
 
-            var tokenSeguridad = new JwtSecurityToken(issuer:null, audience:null, claims:claims, expires=expires, signingCredentials:creds);
+            var tokenSeguridad = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expires, signingCredentials: creds);
 
-            TokenData respuestatoken = new TokenData();
-            respuestatoken.Token = new JwtSecurityTokenHandler().WriteToken(tokenSeguridad);
-            respuestatoken.Expira = expires;
+            TokenData respuestaToken = new TokenData();
+            respuestaToken.Token = new JwtSecurityTokenHandler().WriteToken(tokenSeguridad);
+            respuestaToken.Expira = expires;
 
-            return respuestatoken;
-        }
-
-        public Task<string> DesencriptarPassword(string passwords)
-        {
-            throw new NotImplementedException();
+            return respuestaToken;
         }
 
         public async Task<string> EncriptarPassword(string password)
         {
-            string Encritado = "";
-            using (SHA256 sHA256 = SHA256.Create())
+            string Encriptado = "";
+            using (SHA256 sha256Hash = SHA256.Create())
             {
-                byte[] bytes = sHA256.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                Encritado = Convert.ToBase64String(bytes);
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                Encriptado = Convert.ToBase64String(bytes);
             }
-            return Encritado;
+            return Encriptado;
         }
 
         public Task<bool> ValidarToken(string token)
@@ -66,18 +61,19 @@ namespace Coling.Repositorio.Implementacion
             throw new NotImplementedException();
         }
 
-        public async Task<TokenData> VerificarCredenciales(string usuariox, string passwordx)
+        public async Task<TokenData> VerficarCredenciales(string usuariox, string passwordx)
         {
             TokenData tokenDevolver = new TokenData();
-            string passEncriptado= await EncriptarPassword(passwordx);
-            string consulta = "select count(idusuario) from Usuario where nombreuser= '"+usuariox+"' and password='"+passEncriptado+"'";
-            int Existe = conexion.EjecutarEscalar(consulta);
-            if (Existe > 0)
+            string passEncriptado = await EncriptarPassword(passwordx);
+            string consulta = "select * from Usuario where nombreuser='" + usuariox + "' and password='" + passEncriptado + "'";
+            DataTable Existe = conexion.EjecutarDataTabla(consulta, "tabla");
+            if (Existe.Rows.Count > 0)
             {
-                tokenDevolver = await ConstruirToken(usuariox, passwordx);
-                
+                string rol = Existe.Rows[0]["rol"].ToString();
+                tokenDevolver = await ConstruirToken(usuariox, passwordx, rol);
             }
             return tokenDevolver;
         }
+
     }
 }

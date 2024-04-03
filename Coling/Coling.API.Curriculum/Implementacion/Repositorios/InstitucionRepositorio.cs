@@ -26,12 +26,16 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
 
         }
 
-        public async Task<bool> Delete(string partitionkey, string rowkey)
+        public async Task<bool> Delete(string rowkey)
         {
             try
             {
                 var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
-                await tablaCliente.DeleteEntityAsync(partitionkey, rowkey);
+                var entity = tablaCliente.QueryAsync<Institucion>(filter: $"RowKey eq '{rowkey}'");
+                await foreach (var item in entity)
+                {
+                    await tablaCliente.DeleteEntityAsync(item.PartitionKey, item.RowKey);
+                }
                 return true;
             }
             catch (Exception)

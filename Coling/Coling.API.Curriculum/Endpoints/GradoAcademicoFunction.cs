@@ -1,8 +1,12 @@
 using Coling.API.Curriculum.Contrato.Repositorios;
 using Coling.API.Curriculum.Modelo;
+using Coling.Utilitarios.Attributes;
+using Coling.Utilitarios.Roles;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 namespace Coling.API.Curriculum.Endpoints
@@ -19,6 +23,10 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarGradoAcademico")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("insetarspec", "GradoAcademico")]
+        [OpenApiRequestBody("application/json", typeof(GradoAcademico))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
         public async Task<HttpResponseData> InsertarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             try
@@ -47,6 +55,9 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarGradoAcademico")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("Listarspec", "GradoAcademico")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
         public async Task<HttpResponseData> ListarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
             try
@@ -67,7 +78,11 @@ namespace Coling.API.Curriculum.Endpoints
 
         /*tarea para ahora*/
         [Function("EliminarGradoAcademico")]
-        public async Task<HttpResponseData> EliminarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req, string partitionkey, string rowkey)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("eliminarspec", "GradoAcademico")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
+        public async Task<HttpResponseData> EliminarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarGrado/{id}")] HttpRequestData req, string partitionkey, string rowkey)
         {
             try
             {
@@ -86,7 +101,11 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ObtenerGradoAcademico")]
-        public async Task<HttpResponseData> ObtenerGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req, string id)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("obtenerspec", "GradoAcademico")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
+        public async Task<HttpResponseData> ObtenerGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerGrado/{id}")] HttpRequestData req, string id)
         {
             try
             {
@@ -105,7 +124,11 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ModificarGradoAcademico")]
-        public async Task<HttpResponseData> ModificarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("modificarspec", "GradoAcademico")]
+        [OpenApiRequestBody("application/json", typeof(GradoAcademico))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
+        public async Task<HttpResponseData> ModificarGradoAcademico([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequestData req)
         {
             try
             {

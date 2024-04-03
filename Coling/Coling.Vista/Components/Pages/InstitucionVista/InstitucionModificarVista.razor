@@ -1,0 +1,49 @@
+﻿@page "/institucion/modificar/{rowkey}"
+
+@inject IInstitucionService servicioInstitucion
+@inject NavigationManager nav
+@inject SweetAlertService sweetAlertService
+
+<h3>Modificar Institucion</h3>
+
+@if (institucion != null)
+{
+    <InstitucionFormulario @ref="insform" institucion="institucion" OnValidSubmit="Modificar" Cancelar="Navegar"></InstitucionFormulario>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
+@code {
+    private Institucion institucion;
+    private InstitucionFormulario? insform;
+
+    [Parameter]
+    public string rowkey { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4";
+        string idInstitucion = rowkey;
+        institucion = await servicioInstitucion.ObtenerInstitucionPorId(idInstitucion, token);
+    }
+
+    private async Task Modificar()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyMTIzNzI4fQ._CJHY4RzGQNuT0nNzame3COt-5QXagA0EAHxJToafv4"; // Obtener el token de autenticación
+        var respuesta = await servicioInstitucion.ModificarInstitucion(institucion, token);
+        if (!respuesta)
+        {
+            await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
+            return;
+        }
+        Navegar();
+    }
+
+    private void Navegar()
+    {
+        insform!.formularioPostOk = true;
+        nav.NavigateTo("/instituciones", forceLoad: true);
+    }
+}
