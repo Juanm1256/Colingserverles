@@ -78,6 +78,51 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
 
+        [Function("ListarInstitucionEstado")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
+        [OpenApiOperation("Listarstadospec", "Institucion", Description = " Sirve para listar todas las instituciones")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Institucion>), Description = "Mostrar una lista de instituciones")]
+        public async Task<HttpResponseData> ListarInstitucionEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = repos.Getallstatus();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
+        [Function("ListarInstitucionPorNombre")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
+        [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
+        [OpenApiOperation("Listarstadospec", "Institucion", Description = " Sirve para listar todas las instituciones")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Institucion>), Description = "Mostrar una lista de instituciones")]
+        public async Task<HttpResponseData> ListarInstitucionPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarInstitucionPorNombre/{nombre}")] HttpRequestData req, string nombre)
+        {
+            try
+            {
+                var lista = repos.ListarPorNombre(nombre);
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
         /*tarea para ahora*/
         [Function("EliminarInstitucion")]
         [ColingAuthorize(AplicacionRoles.Admin)]

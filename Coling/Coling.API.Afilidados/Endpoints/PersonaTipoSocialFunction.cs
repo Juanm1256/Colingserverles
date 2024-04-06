@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 namespace Coling.API.Afilidados.Endpoints
@@ -22,9 +24,10 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarPersonaTipoSocial")]
+        [OpenApiOperation("listarPersonaTipoSocial", "PersonaTipoSocial")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<PersonaTipoSocial>))]
         public async Task<HttpResponseData> ListarPersonaTipoSocial([HttpTrigger(AuthorizationLevel.Function, "get", Route = "listarpersonatiposocials")] HttpRequestData req)
         {
-            _logger.LogInformation("Ejecutando azure function para insertar personatiposocials.");
             try
             {
                 var listapersonatiposocials = personatiposocialLogic.ListarPersonaTipoSocialTodos();
@@ -42,10 +45,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("InsertarPersonaTipoSociales")]
+        [OpenApiOperation("insertarPersonaTipoSocial", "PersonaTipoSocial")]
+        [OpenApiRequestBody("application/json", bodyType: typeof(PersonaTipoSocial))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PersonaTipoSocial))]
         public async Task<HttpResponseData> InsertarPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "post", Route = "insertarpersonatiposocial")] HttpRequestData req)
         {
-
-            _logger.LogInformation("Ejecutando azure function para insertar personatiposocials.");
             try
             {
                 var per = await req.ReadFromJsonAsync<PersonaTipoSocial>() ?? throw new Exception("Debe ingresar una personatiposocial con todos sus datos");
@@ -67,10 +71,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("EliminarPersonaTipoSociales")]
-        public async Task<HttpResponseData> EliminarPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "get", Route = "eliminarPersonaTipoSociales/")] HttpRequestData req, int id)
+        [OpenApiOperation("eliminarPersonaTipoSocial", "PersonaTipoSocial")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PersonaTipoSocial))]
+        public async Task<HttpResponseData> EliminarPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarPersonaTipoSociales/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar personatiposocials.");
             try
             {
                 var personatiposocial = await personatiposocialLogic.EliminarPersonaTipoSocial(id);
@@ -92,10 +97,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ObtenerPersonaTipoSociales")]
-        public async Task<HttpResponseData> ObtenerPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerPersonaTipoSociales/")] HttpRequestData req, int id)
+        [OpenApiOperation("obtenerPersonaTipoSocial", "PersonaTipoSocial")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PersonaTipoSocial))]
+        public async Task<HttpResponseData> ObtenerPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerPersonaTipoSociales/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar personatiposocials.");
             try
             {
                 var listapersonatiposocials = personatiposocialLogic.ObtenerPersonaTipoSocialById(id);
@@ -113,10 +119,12 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ModificarPersonaTipoSociales")]
-        public async Task<HttpResponseData> ModificarPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "post", Route = "modificarPersonaTipoSociales/")] HttpRequestData req, int id)
+        [OpenApiOperation("modificarPersonaTipoSocial", "PersonaTipoSocial")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiRequestBody("application/json", bodyType: typeof(PersonaTipoSocial))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PersonaTipoSocial))]
+        public async Task<HttpResponseData> ModificarPersonaTipoSociales([HttpTrigger(AuthorizationLevel.Function, "put", Route = "modificarPersonaTipoSociales/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para modificar personatiposocials.");
             try
             {
                 var per = await req.ReadFromJsonAsync<PersonaTipoSocial>() ?? throw new Exception("Debe ingresar una personatiposocial con todos sus datos");

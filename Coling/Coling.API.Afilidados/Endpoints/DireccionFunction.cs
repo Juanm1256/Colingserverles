@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 namespace Coling.API.Afilidados.Endpoints
@@ -22,9 +24,10 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarDireccion")]
+        [OpenApiOperation("listarDireccion", "Direccion")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Direccion>))]
         public async Task<HttpResponseData> ListarDireccion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "listarDireccion")] HttpRequestData req)
         {
-            _logger.LogInformation("Ejecutando azure function para insertar direccions.");
             try
             {
                 var listadireccion = direccionLogic.ListarDireccionTodos();
@@ -42,10 +45,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("InsertarDireccion")]
+        [OpenApiOperation("insertarDireccion", "Direccion")]
+        [OpenApiRequestBody("application/json", bodyType: typeof(Direccion))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Direccion))]
         public async Task<HttpResponseData> InsertarDireccion([HttpTrigger(AuthorizationLevel.Function, "post", Route = "insertardireccion")] HttpRequestData req)
         {
-
-            _logger.LogInformation("Ejecutando azure function para insertar direccions.");
             try
             {
                 var per = await req.ReadFromJsonAsync<Direccion>() ?? throw new Exception("Debe ingresar una direccion con todos sus datos");
@@ -67,10 +71,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("EliminarDireccion")]
-        public async Task<HttpResponseData> EliminarDireccion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "eliminarDireccion/")] HttpRequestData req, int id)
+        [OpenApiOperation("eliminarDireccion", "Direccion")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Direccion))]
+        public async Task<HttpResponseData> EliminarDireccion([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarDireccion/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar direccions.");
             try
             {
                 var direccion = await direccionLogic.EliminarDireccion(id);
@@ -92,10 +97,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ObtenerDireccion")]
-        public async Task<HttpResponseData> ObtenerDireccion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerDireccion/")] HttpRequestData req, int id)
+        [OpenApiOperation("obtenerDireccion", "Direccion")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Direccion))]
+        public async Task<HttpResponseData> ObtenerDireccion([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerDireccion/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar direccions.");
             try
             {
                 var listadireccions = direccionLogic.ObtenerDireccionById(id);
@@ -113,10 +119,12 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ModificarDireccion")]
-        public async Task<HttpResponseData> ModificarDireccion([HttpTrigger(AuthorizationLevel.Function, "post", Route = "modificarDireccion/")] HttpRequestData req, int id)
+        [OpenApiOperation("modificarDireccion", "Direccion")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiRequestBody("application/json", bodyType: typeof(Direccion))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Direccion))]
+        public async Task<HttpResponseData> ModificarDireccion([HttpTrigger(AuthorizationLevel.Function, "put", Route = "modificarDireccion/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para modificar direccions.");
             try
             {
                 var per = await req.ReadFromJsonAsync<Direccion>() ?? throw new Exception("Debe ingresar una direccion con todos sus datos");

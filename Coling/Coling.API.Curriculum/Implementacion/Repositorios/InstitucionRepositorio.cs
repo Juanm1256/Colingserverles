@@ -67,6 +67,30 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             return lista;
         }
 
+        public async Task<List<Institucion>> Getallstatus()
+        {
+            List<Institucion> lista = new List<Institucion>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo' or Estado eq 'Inactivo'";
+            await foreach (Institucion institucion in tablaCliente.QueryAsync<Institucion>(filter: filtro))
+            {
+                lista.Add(institucion);
+            }
+            return lista;
+        }
+
+        public async Task<List<Institucion>> ListarPorNombre(string nombre)
+        {
+            List<Institucion> lista = new List<Institucion>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Nombre eq '{nombre}'";
+            await foreach (Institucion institucion in tablaCliente.QueryAsync<Institucion>(filter: filtro))
+            {
+                lista.Add(institucion);
+            }
+            return lista;
+        }
+
         public async Task<bool> Insertar(Institucion institucion)
         {
             try
@@ -81,6 +105,7 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
                 return false;
             }
         }
+
 
         public async Task<bool> UpdateIns(Institucion institucion)
         {
