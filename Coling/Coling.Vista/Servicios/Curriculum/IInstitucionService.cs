@@ -10,6 +10,8 @@ namespace Coling.Vista.Servicios.Curriculum
     public interface IInstitucionService
     {
         Task<List<Institucion>> ListarInstitucion(string token);
+        Task<List<Institucion>> ListarEstado(string token);
+        Task<List<Institucion>> ListarPorNombre(string nombre, string token);
         Task<bool> InsertarInstitucion(Institucion institucion, string token);
         Task<bool> ModificarInstitucion(Institucion institucion, string token);
         Task<bool> EliminarInstitucion(string id, string token);

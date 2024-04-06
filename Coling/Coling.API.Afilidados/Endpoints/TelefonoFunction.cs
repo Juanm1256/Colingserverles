@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 namespace Coling.API.Afilidados.Endpoints
@@ -22,9 +24,10 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarTelefonos")]
+        [OpenApiOperation("listarTelefonos", "Telefonos")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Telefono>))]
         public async Task<HttpResponseData> ListarTelefonos([HttpTrigger(AuthorizationLevel.Function, "get", Route = "listartelefonos")] HttpRequestData req)
         {
-            _logger.LogInformation("Ejecutando azure function para insertar telefonos.");
             try
             {
                 var listatelefonos = telefonoLogic.ListarTelefonoTodos();
@@ -42,10 +45,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("InsertarTelefono")]
+        [OpenApiOperation("insertarTelefonos", "Telefonos")]
+        [OpenApiRequestBody("application/json", bodyType: typeof(Telefono))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Telefono))]
         public async Task<HttpResponseData> InsertarTelefono([HttpTrigger(AuthorizationLevel.Function, "post", Route = "insertartelefono")] HttpRequestData req)
         {
-
-            _logger.LogInformation("Ejecutando azure function para insertar telefonos.");
             try
             {
                 var per = await req.ReadFromJsonAsync<Telefono>() ?? throw new Exception("Debe ingresar una telefono con todos sus datos");
@@ -67,10 +71,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("EliminarTelefono")]
-        public async Task<HttpResponseData> EliminarTelefono([HttpTrigger(AuthorizationLevel.Function, "get", Route = "eliminarTelefono/")] HttpRequestData req, int id)
+        [OpenApiOperation("eliminarTelefonos", "Telefonos")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Telefono))]
+        public async Task<HttpResponseData> EliminarTelefono([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarTelefono/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar telefonos.");
             try
             {
                 var telefono = await telefonoLogic.EliminarTelefono(id);
@@ -92,10 +97,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ObtenerTelefono")]
-        public async Task<HttpResponseData> ObtenerTelefono([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerTelefono/")] HttpRequestData req, int id)
+        [OpenApiOperation("obtenerTelefonos", "Telefonos")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Telefono))]
+        public async Task<HttpResponseData> ObtenerTelefono([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerTelefono/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para eliminar telefonos.");
             try
             {
                 var listatelefonos = telefonoLogic.ObtenerTelefonoById(id);
@@ -113,10 +119,12 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ModificarTelefono")]
-        public async Task<HttpResponseData> ModificarTelefono([HttpTrigger(AuthorizationLevel.Function, "post", Route = "modificarTelefono/")] HttpRequestData req, int id)
+        [OpenApiOperation("modificarTelefonos", "Telefonos")]
+        [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
+        [OpenApiRequestBody("application/json", bodyType: typeof(Telefono))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Telefono))]
+        public async Task<HttpResponseData> ModificarTelefono([HttpTrigger(AuthorizationLevel.Function, "put", Route = "modificarTelefono/{id}")] HttpRequestData req, int id)
         {
-
-            _logger.LogInformation("Ejecutando azure function para modificar telefonos.");
             try
             {
                 var per = await req.ReadFromJsonAsync<Telefono>() ?? throw new Exception("Debe ingresar una telefono con todos sus datos");

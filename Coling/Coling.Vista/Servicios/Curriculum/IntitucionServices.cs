@@ -11,14 +11,46 @@ namespace Coling.Vista.Servicios.Curriculum
 {
     public class IntitucionServices : IInstitucionService
     {
-        string url = "http://localhost:7015";
-        string endPoint = "";
-        HttpClient client = new HttpClient();
+        string url = "http://localhost:7015/";
+        private readonly HttpClient client;
+
+        public IntitucionServices( HttpClient client)
+        {
+            this.client = client;
+            this.client.BaseAddress = new Uri(url);
+        }
 
         public async Task<List<Institucion>> ListarInstitucion(string token)
         {
-            endPoint = "api/ListarInstitucion";
-            client.BaseAddress = new Uri(url);
+            string endPoint = "api/ListarInstitucion";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<Institucion> result = new List<Institucion>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Institucion>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
+        public async Task<List<Institucion>> ListarEstado(string token)
+        {
+            string endPoint = "api/ListarInstitucionEstado";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<Institucion> result = new List<Institucion>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Institucion>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
+        public async Task<List<Institucion>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = url + $"api/ListarInstitucionPorNombre/{nombre}";
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
@@ -33,11 +65,10 @@ namespace Coling.Vista.Servicios.Curriculum
         }
 
 
-
         public async Task<bool> InsertarInstitucion(Institucion institucion, string token)
         {
             bool sw = false;
-            endPoint = url + "/api/InsertarInstitucion";
+            string endPoint = url + "api/InsertarInstitucion";
             string jsonBody = JsonConvert.SerializeObject(institucion);
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
@@ -52,7 +83,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> ModificarInstitucion(Institucion institucion, string token)
         {
             bool sw = false;
-            endPoint = url + "/api/ModificarInstitucion";
+            string endPoint = url + "api/ModificarInstitucion";
             string jsonBody = JsonConvert.SerializeObject(institucion);
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
@@ -67,7 +98,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> EliminarInstitucion(string idInstitucion, string token)
         {
             bool sw = false;
-            endPoint = url + $"/api/eliminarInstitucion/{idInstitucion}";
+            string endPoint = url + $"api/eliminarInstitucion/{idInstitucion}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage respuesta = await client.DeleteAsync(endPoint);
             if (respuesta.IsSuccessStatusCode)
@@ -79,7 +110,7 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<Institucion> ObtenerInstitucionPorId(string rowkey, string token)
         {
-            endPoint = url + $"/api/obtenerInstitucion/{rowkey}";
+            string endPoint = url + $"api/obtenerInstitucion/{rowkey}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage response = await client.GetAsync(endPoint);
@@ -91,5 +122,6 @@ namespace Coling.Vista.Servicios.Curriculum
             }
             return institucion;
         }
+
     }
 }

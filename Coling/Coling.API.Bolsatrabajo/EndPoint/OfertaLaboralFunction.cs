@@ -22,7 +22,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ListarOferta")]
-        [OpenApiOperation("Listarspec", "ListarOferta", Description = " Sirve para listar todas las Ofertas Laborales")]
+        [OpenApiOperation("Listarspec", "OfertaLaboral", Description = " Sirve para listar todas las Ofertas Laborales")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Mostrar una lista de Ofertas Laborales")]
 
         public async Task<HttpResponseData> ListarOferta([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -42,7 +42,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("InsertarOferta")]
-        [OpenApiOperation("Insertarspec", "InsertarOferta", Description = " Sirve para listar todas las Ofertas Laborales")]
+        [OpenApiOperation("Insertarspec", "OfertaLaboral", Description = " Sirve para listar todas las Ofertas Laborales")]
         [OpenApiRequestBody("application/json", typeof(OfertaLaboral), Description = "Oferta Laboral modelo")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(OfertaLaboral), Description = "Insertara la Oferta Laboral.")]
 
@@ -66,17 +66,16 @@ namespace Coling.API.Bolsatrabajo.EndPoint
             }
             catch (Exception)
             {
-
                 var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
                 return respuesta;
             }
         }
 
         [Function("ModificarOferta")]
-        [OpenApiOperation("ModificarOfertaLaboral", "Modifica una oferta laboral", Summary = "Modifica una oferta laboral existente en el sistema.")]
-        [OpenApiRequestBody("application/json", typeof(OfertaLaboral), Description = "Objeto de tipo OfertaLaboral que representa la oferta laboral a modificar.")]
+        [OpenApiOperation("ModificarOfertaLaboral", "OfertaLaboral", Summary = "Modifica una oferta laboral existente en el sistema.")]
         [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID de la oferta laboral", Description = "El ID de la oferta laboral a modificar.")]
-
+        [OpenApiRequestBody("application/json", typeof(OfertaLaboral), Description = "Objeto de tipo OfertaLaboral que representa la oferta laboral a modificar.")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType:typeof(OfertaLaboral))]
         public async Task<HttpResponseData> ModificarOfertaLaboral(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "modificarOfertaLaboral/{id}")] HttpRequestData req, string id)
         {
@@ -103,10 +102,9 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("EliminarOferta")]
-        [OpenApiOperation("Eliminarprec", "EliminarOfertaLaboral", Description = "Este endpoint nos sirve para eliminar")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(OfertaLaboral), Description = "Confirmación de eliminación exitosa")]
+        [OpenApiOperation("Eliminarprec", "OfertaLaboral", Description = "Este endpoint nos sirve para eliminar")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la oferta Laboral a eliminar")]
-
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(OfertaLaboral), Description = "Confirmación de eliminación exitosa")]
         public async Task<HttpResponseData> EliminarOfertaLaboral(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "EliminarOferta/{id}")] HttpRequestData req,
             string id)
@@ -133,9 +131,9 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ObtenerOfertaLaboral")]
-        [OpenApiOperation("Listarspec", "ObtenerOfertaLaboral", Description = " Sirve para obtener la oferta Laboral")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Datos de la oferta Laboral correspondiente al ID proporcionado.")]
+        [OpenApiOperation("Listarspec", "OfertaLaboral", Description = " Sirve para obtener la oferta Laboral")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la oferta a obtener la oferta Laboral")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Datos de la oferta Laboral correspondiente al ID proporcionado.")]
 
         public async Task<HttpResponseData> ObtenerOfertaLaboral(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ObtenerOfertaLaboral/{id}")] HttpRequestData req, string id)

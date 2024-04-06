@@ -17,10 +17,16 @@ namespace Coling.Vista
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
             builder.Services.AddSweetAlert2();
+            builder.Services.AddBlazorBootstrap();
             builder.Services.AddHttpClient();
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<IPersonaService, PersonaService>();
             builder.Services.AddScoped<IInstitucionService, IntitucionServices>();
+            builder.Services.AddScoped<IEstudioService, EstudioService>();
+            builder.Services.AddScoped<IExperienciaLaboralService, ExperienciaLaboralService>();
+            builder.Services.AddScoped<IGradoAcademicoService, GradoAcademicoService>();
+            builder.Services.AddScoped<IProfesionService, ProfesionService>();
+            builder.Services.AddScoped<ITipoEstudioService, TipoEstudioService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
