@@ -67,11 +67,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.14" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Servicios\Bolsatrabajo\" />
-      <Folder Include="Servicios\Autentificacion\" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
     </ItemGroup>
 
     <ItemGroup>

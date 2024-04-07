@@ -12,6 +12,8 @@ namespace Coling.API.Bolsatrabajo.Contratos.Repositorio
     {
         public Task<bool> Insertar(Solicitud solicitud);
         public Task<List<Solicitud>> getall();
+        public Task<List<Solicitud>> ListarSolicitudEstado();
+        public Task<List<Solicitud>> ListarSolicitudPorNombre(string nombre);
         public Task<bool> UpdateIns(Solicitud solicitud, string id);
         public Task<bool> Eliminar(string id);
         public Task<Solicitud> ObtenerbyId(string id);

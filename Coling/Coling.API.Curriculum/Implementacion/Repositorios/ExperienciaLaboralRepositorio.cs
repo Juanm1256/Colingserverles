@@ -61,6 +61,30 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             return lista;
         }
 
+        public async Task<List<ExperienciaLaboral>> Getallstatus()
+        {
+            List<ExperienciaLaboral> lista = new List<ExperienciaLaboral>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo' or Estado eq 'Inactivo'";
+            await foreach (ExperienciaLaboral experienciaLaboral in tablaCliente.QueryAsync<ExperienciaLaboral>(filter: filtro))
+            {
+                lista.Add(experienciaLaboral);
+            }
+            return lista;
+        }
+
+        public async Task<List<ExperienciaLaboral>> ListarPorNombre(string nombre)
+        {
+            List<ExperienciaLaboral> lista = new List<ExperienciaLaboral>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Institucion ge '{nombre}' and Estado ne 'Eliminado'";
+            await foreach (ExperienciaLaboral experiencia in tablaCliente.QueryAsync<ExperienciaLaboral>(filter: filtro))
+            {
+                lista.Add(experiencia);
+            }
+            return lista;
+        }
+
         public async Task<bool> Insertar(ExperienciaLaboral experienciaLaboral)
         {
             try

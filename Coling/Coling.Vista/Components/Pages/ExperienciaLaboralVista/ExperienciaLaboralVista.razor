@@ -1,0 +1,393 @@
+﻿@page "/experiencialaboral"
+
+@inject IExperienciaLaboralService servicio
+@inject NavigationManager nav
+@inject SweetAlertService sweetAlertService
+
+@if (mostrarModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label>Afiliado:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@experiencialaboral.Afiliado"></InputText>
+                                <ValidationMessage For="@(()=>experiencialaboral.Afiliado)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Institucion:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@experiencialaboral.Institucion"></InputText>
+                                <ValidationMessage For="@(()=>experiencialaboral.Institucion)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Cargo Titulo:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@experiencialaboral.CargoTitulo"></InputText>
+                                <ValidationMessage For="@(()=>experiencialaboral.CargoTitulo)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fecha Inicio:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@experiencialaboral.FechaInicio"></InputText>
+                                <ValidationMessage For="@(()=>experiencialaboral.FechaInicio)"></ValidationMessage>
+                            </div>
+                        </div>
+                       
+                        <div class="mb-3">
+                            <label>Fecha Final:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@experiencialaboral.FechaFinal"></InputText>
+                                <ValidationMessage For="@(()=>experiencialaboral.FechaFinal)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Listar Experiencia Laboral</h3>
+
+<div class="form-group row">
+    <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
+        CREAR
+    </button>
+</div>
+
+<div class="form-group row">
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+</div>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><strong>Afiliado</strong></th>
+                <th><strong>Institucion</strong></th>
+                <th><strong>Cargo Titulo</strong></th>
+                <th><strong>Fecha Inicio</strong></th>
+                <th><strong>Fecha Final</strong></th>
+                <th><strong>Estado</strong></th>
+                <th><strong>Acciones</strong></th>
+            </tr>
+        </thead>
+        @foreach (var item in ExperienciaLaboralListaPaginada)
+        {
+            <tr>
+                <td>@item.Afiliado</td>
+                <td>@item.Institucion</td>
+                <td>@item.CargoTitulo</td>
+                <td>@item.FechaInicio</td>
+                <td>@item.FechaFinal</td>
+                <td>@item.Estado</td>
+                <td>
+                    @if (item.Estado == "Activo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Desactivar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
+                    }
+                    @if (item.Estado == "Inactivo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Activar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
+                    }
+
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+    <!-- Botones de paginación -->
+    <button class="btn btn-primary" disabled="@EsPaginaInicial" @onclick="IrAPaginaAnterior">Anterior</button>
+    <span>Página @paginaActual de @TotalPaginas</span>
+    <button class="btn btn-primary" disabled="@EsPaginaFinal" @onclick="IrAPaginaSiguiente">Siguiente</button>
+</div>
+
+@code {
+
+    private EditContext contextoEdicion;
+    private string modalTitle = "Crear ExperienciaLaboral";
+    private string modalButtonLabel = "Crear";
+    private ExperienciaLaboral experiencialaboral = new ExperienciaLaboral();
+    private bool mostrarModal = false;
+    private string filtroNombre;
+    private List<ExperienciaLaboral> ExperienciaLaboralListaPaginada { get; set; } = new List<ExperienciaLaboral>();
+    private int paginaActual = 1;
+    private int pageSize = 5;
+
+    public List<ExperienciaLaboral> ExperienciaLaboralLista { get; set; } = new List<ExperienciaLaboral>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contextoEdicion = new EditContext(experiencialaboral);
+        await CargarExperienciaLaboral();
+    }
+
+    async Task CargarExperienciaLaboral()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        ExperienciaLaboralLista = await servicio.ListarEstado(token);
+        await ActualizarListaPaginada();
+    }
+
+    private async Task ActualizarListaPaginada()
+    {
+        int inicio = (paginaActual - 1) * pageSize;
+        int fin = inicio + pageSize;
+        ExperienciaLaboralListaPaginada = ExperienciaLaboralLista.Skip(inicio).Take(pageSize).ToList();
+    }
+
+    private async Task IrAPaginaAnterior()
+    {
+        if (paginaActual > 1)
+        {
+            paginaActual--;
+            await ActualizarListaPaginada();
+        }
+    }
+
+    private async Task IrAPaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas)
+        {
+            paginaActual++;
+            await ActualizarListaPaginada();
+        }
+    }
+
+
+    private bool EsPaginaInicial => paginaActual == 1;
+    private bool EsPaginaFinal => paginaActual == TotalPaginas;
+    private int TotalPaginas => (int)Math.Ceiling((double)ExperienciaLaboralLista.Count / pageSize);
+    private async Task GuardarCambios()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+
+        if (!string.IsNullOrEmpty(experiencialaboral.RowKey))
+        {
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas modificar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Modificar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                var respuesta = await servicio.Modificar(experiencialaboral, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo modificar", SweetAlertIcon.Error);
+                    return;
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Modificado", "Se modifico correctamente", SweetAlertIcon.Success);
+                }
+            }
+            CerrarModal();
+            await CargarExperienciaLaboral();
+        }
+        else
+        {
+            experiencialaboral.PartitionKey = "Educacion";
+            experiencialaboral.Estado = "Activo";
+            var respuesta = await servicio.Insertar(experiencialaboral, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Guardado", "Se guardo correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            ExperienciaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            CerrarModal();
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            CerrarModal();
+            await CargarExperienciaLaboral();
+        }
+    }
+
+
+    private async Task EliminarExperienciaLaboral(string RK)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        experiencialaboral = await servicio.ObtenerPorId(RK, token);
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¿Deseas borrar este registro de institución?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrarlo",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (result.IsConfirmed)
+        {
+            experiencialaboral.Estado = "Eliminado";
+            var respuesta = await servicio.Modificar(experiencialaboral, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo eliminar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Eliminado", "Se Elimino Correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            ExperienciaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarExperienciaLaboral();
+        }
+    }
+
+    private void AbrirModalCrear()
+    {
+        experiencialaboral = new ExperienciaLaboral();
+        contextoEdicion = new EditContext(experiencialaboral);
+        modalTitle = "Crear ExperienciaLaboral";
+        modalButtonLabel = "Crear";
+        mostrarModal = true;
+    }
+
+    private async Task AbrirModalModificar(string rowKey)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        experiencialaboral = await servicio.ObtenerPorId(rowKey, token);
+        contextoEdicion = new EditContext(experiencialaboral);
+        modalTitle = "Modificar ExperienciaLaboral";
+        modalButtonLabel = "Guardar Cambios";
+        mostrarModal = true;
+    }
+
+    private async Task cambiarestado(string rowKey, string estado)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        if (estado == "Activo")
+        {
+            experiencialaboral = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas desactivar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Desactivar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                experiencialaboral.Estado = "Inactivo";
+                var respuesta = await servicio.Modificar(experiencialaboral, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo desactivar", SweetAlertIcon.Error);
+                    await CargarExperienciaLaboral();
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Desactivado", "Se Desactivo correctamente", SweetAlertIcon.Success);
+                    await CargarExperienciaLaboral();
+                }
+
+            }
+        }
+        else
+        {
+            experiencialaboral = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas Activar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Activar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                experiencialaboral.Estado = "Activo";
+                var respuesta = await servicio.Modificar(experiencialaboral, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo activar", SweetAlertIcon.Error);
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Activado", "Se Activo correctamente", SweetAlertIcon.Success);
+                }
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            ExperienciaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarExperienciaLaboral();
+        }
+    }
+    private async Task BuscarPorNombre(ChangeEventArgs e)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        filtroNombre = e.Value.ToString();
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            ExperienciaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarExperienciaLaboral();
+            await ActualizarListaPaginada();
+        }
+
+    }
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+    }
+}

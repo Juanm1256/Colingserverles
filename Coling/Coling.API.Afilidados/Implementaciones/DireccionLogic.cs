@@ -49,6 +49,19 @@ namespace Coling.API.Afilidados.Implementaciones
             return listar;
         }
 
+        public async Task<List<Direccion>> ListarDireccionEstado()
+        {
+            var listar = await contexto.Direccions.ToListAsync();
+            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
+            return respuesta.ToList();
+        }
+
+        public async Task<List<Direccion>> ListarDireccionPorNombre(string nombre)
+        {
+            var listar = await contexto.Direccions.Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
+            return listar;
+        }
+
         public async Task<bool> ModificarDireccion(Direccion direccion, int id)
         {
             bool sw = false;

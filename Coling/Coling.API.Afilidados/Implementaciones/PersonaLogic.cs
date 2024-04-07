@@ -43,6 +43,20 @@ namespace Coling.API.Afilidados.Implementaciones
             return sq;
         }
 
+        public async Task<List<Persona>> ListarPersonaEstado()
+        {
+            var listar = await contexto.Personas.ToListAsync();
+            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
+            return respuesta.ToList();
+        }
+
+        public async Task<List<Persona>> ListarPersonaPorNombre(string nombre)
+        {
+            var listar = await contexto.Personas.ToListAsync();
+            var respuesta = listar.Where(x => x.Nombre == nombre );
+            return respuesta.ToList();
+        }
+
         public async Task<List<Persona>> ListarPersonaTodos()
         {
             var listar = await contexto.Personas.ToListAsync();
@@ -64,7 +78,6 @@ namespace Coling.API.Afilidados.Implementaciones
                 await contexto.SaveChangesAsync();
                 sw = true;
             }
-
             return sw;
         }
 

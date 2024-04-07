@@ -11,6 +11,7 @@ namespace Coling.Vista.Servicios.Curriculum
     {
         Task<List<ExperienciaLaboral>> Listar(string token);
         Task<List<ExperienciaLaboral>> ListarEstado(string token);
+        Task<List<ExperienciaLaboral>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(ExperienciaLaboral experienciaLaboral, string token);
         Task<bool> Modificar(ExperienciaLaboral experienciaLaboral, string token);
         Task<bool> Eliminar(string id, string token);

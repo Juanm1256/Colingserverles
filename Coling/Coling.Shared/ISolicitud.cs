@@ -14,5 +14,6 @@ namespace Coling.Shared
         public string? PretencionSalarial { get; set; }
         public string? Acercade { get; set; }
         public string? Oferta { get; set; }
+        public string? Estado { get; set; }
     }
 }

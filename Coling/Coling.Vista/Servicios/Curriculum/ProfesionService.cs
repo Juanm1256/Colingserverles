@@ -78,7 +78,19 @@ namespace Coling.Vista.Servicios.Curriculum
             }
             return result;
         }
-
+        public async Task<List<Profesion>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = $"api/ListarPorNombreProfesion/{nombre}";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<Profesion> result = new List<Profesion>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Profesion>>(respuestaCuerpo);
+            }
+            return result;
+        }
         public async Task<bool> Modificar(Profesion profesion, string token)
         {
             bool sw = false;

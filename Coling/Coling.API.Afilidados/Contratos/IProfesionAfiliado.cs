@@ -13,6 +13,8 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> ModificaProfesionAfiliado(ProfesionAfiliado profesionAfiliado, int id);
         public Task<bool> EliminarProfesionAfiliado(int id);
         public Task<List<ProfesionAfiliado>> ListarProfesionAfiliadoTodos();
+        public Task<List<ProfesionAfiliado>> ListarProfesionAfiliadoEstado();
+        public Task<List<ProfesionAfiliado>> ListarProfesionAfiliadoPorNombre(string nombre);
         public Task<ProfesionAfiliado> ObtenerProfesionAfiliadoById(int id);
     }
 }

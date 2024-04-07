@@ -61,6 +61,30 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             return lista;
         }
 
+        public async Task<List<TipoEstudio>> Getallstatus()
+        {
+            List<TipoEstudio> lista = new List<TipoEstudio>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo' or Estado eq 'Inactivo'";
+            await foreach (TipoEstudio tipoEstudio in tablaCliente.QueryAsync<TipoEstudio>(filter: filtro))
+            {
+                lista.Add(tipoEstudio);
+            }
+            return lista;
+        }
+
+        public async Task<List<TipoEstudio>> ListarPorNombre(string nombre)
+        {
+            List<TipoEstudio> lista = new List<TipoEstudio>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and NombreProfesion ge '{nombre}' and Estado ne 'Eliminado'";
+            await foreach (TipoEstudio tipoEstudio in tablaCliente.QueryAsync<TipoEstudio>(filter: filtro))
+            {
+                lista.Add(tipoEstudio);
+            }
+            return lista;
+        }
+
         public async Task<bool> Insertar(TipoEstudio tipoEstudio)
         {
             try

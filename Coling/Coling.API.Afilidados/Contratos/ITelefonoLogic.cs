@@ -13,6 +13,8 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> ModificarTelefono(Telefono telefono, int id);
         public Task<bool> EliminarTelefono(int id);
         public Task<List<Telefono>> ListarTelefonoTodos();
+        public Task<List<Telefono>> ListarTelefonoEstado();
+        public Task<List<Telefono>> ListarTelefonoPorNombre(string nombre);
         public Task<Telefono> ObtenerTelefonoById(int id);
 
     }

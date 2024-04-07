@@ -13,6 +13,8 @@ namespace Coling.API.Curriculum.Contrato.Repositorios
         public Task<bool> UpdateIns(ExperienciaLaboral experiencia);
         public Task<bool> Delete(string partitionkey, string rowkey);
         public Task<List<ExperienciaLaboral>> Getall();
+        public Task<List<ExperienciaLaboral>> Getallstatus();
+        public Task<List<ExperienciaLaboral>> ListarPorNombre(string nombre);
         public Task<ExperienciaLaboral> Get(string id);
     }
 }

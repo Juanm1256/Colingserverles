@@ -1,6 +1,8 @@
 using Coling.API.Afilidados.Contratos;
 using Coling.API.Afilidados.Implementaciones;
 using Coling.Shared;
+using Coling.Utilitarios.Attributes;
+using Coling.Utilitarios.Roles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -23,10 +25,11 @@ namespace Coling.API.Afilidados.Endpoints
             this.tipoSocial = tipoSocial;
         }
 
-        [Function("ListarTipoSocials")]
+        [Function("ListarTipoSocial")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("listarTipoSocial", "TipoSocial")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<TipoSocial>))]
-        public async Task<HttpResponseData> ListarTipoSocials([HttpTrigger(AuthorizationLevel.Function, "get", Route = "listartiposocial")] HttpRequestData req)
+        public async Task<HttpResponseData> ListarTipoSocials([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarTipoSocial")] HttpRequestData req)
         {
             try
             {
@@ -44,11 +47,58 @@ namespace Coling.API.Afilidados.Endpoints
 
         }
 
+        [Function("ListarTipoSocialEstado")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarTipoSocial", "TipoSocial", Description = "Listar TipoSocial")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<TipoSocial>))]
+        public async Task<HttpResponseData> ListarTipoSocialEstado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarTipoSocialEstado")] HttpRequestData req)
+        {
+            _logger.LogInformation("Ejecutando azure function para insertar tipoSocial.");
+            try
+            {
+                var listatipoSocial = tipoSocial.ListarTipoSocialEstado();
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listatipoSocial.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+        [Function("ListarTipoSocialPorNombre")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarTipoSocial", "TipoSocial", Description = "Listar TipoSocial")]
+        [OpenApiParameter("nombre", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<TipoSocial>))]
+        public async Task<HttpResponseData> ListarTipoSocialPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarTipoSocialPorNombre/{nombre}")] HttpRequestData req, string nombre)
+        {
+            _logger.LogInformation("Ejecutando azure function para insertar tipoSocial.");
+            try
+            {
+                var listatipoSocial = tipoSocial.ListarTipoSocialPorNombre(nombre);
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listatipoSocial.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
         [Function("InsertarTipoSocial")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("insertarTipoSocial", "TipoSocial")]
         [OpenApiRequestBody("application/json", bodyType: typeof(TipoSocial))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(TipoSocial))]
-        public async Task<HttpResponseData> InsertarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "post", Route = "insertartipoSocial")] HttpRequestData req)
+        public async Task<HttpResponseData> InsertarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "post", Route = "InsertarTipoSocial")] HttpRequestData req)
         {
             try
             {
@@ -71,10 +121,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("EliminarTipoSocial")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("eliminarTipoSocial", "TipoSocial")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(TipoSocial))]
-        public async Task<HttpResponseData> EliminarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "eliminarTipoSocial/{id}")] HttpRequestData req, int id)
+        public async Task<HttpResponseData> EliminarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "EliminarTipoSocial/{id}")] HttpRequestData req, int id)
         {
             try
             {
@@ -97,10 +148,11 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ObtenerTipoSocial")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("obtenerTipoSocial", "TipoSocial")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(TipoSocial))]
-        public async Task<HttpResponseData> ObtenerTipoSocial([HttpTrigger(AuthorizationLevel.Function, "get", Route = "obtenerTipoSocial/{id}")] HttpRequestData req, int id)
+        public async Task<HttpResponseData> ObtenerTipoSocial([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ObtenerTipoSocial/{id}")] HttpRequestData req, int id)
         {
             try
             {
@@ -119,11 +171,12 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ModificarTipoSocial")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("modificarTipoSocial", "TipoSocial")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
         [OpenApiRequestBody("application/json", bodyType: typeof(TipoSocial))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(TipoSocial))]
-        public async Task<HttpResponseData> ModificarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "put", Route = "modificarTipoSocial/{id}")] HttpRequestData req, int id)
+        public async Task<HttpResponseData> ModificarTipoSocial([HttpTrigger(AuthorizationLevel.Function, "put", Route = "ModificarTipoSocial/{id}")] HttpRequestData req, int id)
         {
             try
             {

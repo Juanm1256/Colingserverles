@@ -13,6 +13,8 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> ModificarDireccion(Direccion direccion, int id);
         public Task<bool> EliminarDireccion(int id);
         public Task<List<Direccion>> ListarDireccionTodos();
+        public Task<List<Direccion>> ListarDireccionEstado();
+        public Task<List<Direccion>> ListarDireccionPorNombre(string nombre);
         public Task<Direccion> ObtenerDireccionById(int id);
     }
 }

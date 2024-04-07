@@ -61,6 +61,30 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             return lista;
         }
 
+        public async Task<List<GradoAcademico>> Getallstatus()
+        {
+            List<GradoAcademico> lista = new List<GradoAcademico>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo' or Estado eq 'Inactivo'";
+            await foreach (GradoAcademico experienciaLaboral in tablaCliente.QueryAsync<GradoAcademico>(filter: filtro))
+            {
+                lista.Add(experienciaLaboral);
+            }
+            return lista;
+        }
+
+        public async Task<List<GradoAcademico>> ListarPorNombre(string nombre)
+        {
+            List<GradoAcademico> lista = new List<GradoAcademico>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and NombreGrado ge '{nombre}' and Estado ne 'Eliminado'";
+            await foreach (GradoAcademico experiencia in tablaCliente.QueryAsync<GradoAcademico>(filter: filtro))
+            {
+                lista.Add(experiencia);
+            }
+            return lista;
+        }
+
         public async Task<bool> Insertar(GradoAcademico gradoacademico)
         {
             try

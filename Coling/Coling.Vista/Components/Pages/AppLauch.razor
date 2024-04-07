@@ -1,0 +1,31 @@
+﻿@page "/";
+@inject NavigationManager nav;
+
+
+Loading...
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        string userd = await SecureStorage.GetAsync(nameof(Settings.detalleuser));
+        if (!string.IsNullOrWhiteSpace(userd))
+        {
+            var userdt = JsonConvert.DeserializeObject<Detalleuser>(userd);
+
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
+            if (jsontoken.ValidTo < DateTime.UtcNow)
+            {
+                nav.NavigateTo("/login");
+            }else
+            {
+                Settings.detalleuser = userdt;
+                nav.NavigateTo("/dashboard");
+            }
+        }
+        else
+        {
+            nav.NavigateTo("/login");
+        }
+    }
+}

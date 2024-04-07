@@ -10,6 +10,6 @@ namespace Coling.Shared
     {
         public string NombreProfesion { get; set; }
         public string Idgrado { get; set; }
-        public string Activo { get; set; }
+        public string Estado { get; set; }
     }
 }

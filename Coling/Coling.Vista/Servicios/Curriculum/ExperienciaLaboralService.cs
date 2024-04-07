@@ -23,7 +23,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> Eliminar(string id, string token)
         {
             bool sw = false;
-            endPoint = url + $"api/eliminarExperienciaLaboral/{id}";
+            endPoint = url + $"api/eliminarExperiencia/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage respuesta = await client.DeleteAsync(endPoint);
             if (respuesta.IsSuccessStatusCode)
@@ -64,7 +64,21 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<List<ExperienciaLaboral>> ListarEstado(string token)
         {
-            string endPoint = "api/ListarExperienciaLaboralEstado";
+            string endPoint = "api/ListarExpLabosEstado";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<ExperienciaLaboral> result = new List<ExperienciaLaboral>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<ExperienciaLaboral>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
+        public async Task<List<ExperienciaLaboral>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = $"api/ListarPorNombreExpeLabIns/{nombre}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage response = await client.GetAsync(endPoint);
             List<ExperienciaLaboral> result = new List<ExperienciaLaboral>();
@@ -93,7 +107,7 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<ExperienciaLaboral> ObtenerPorId(string id, string token)
         {
-            endPoint = url + $"api/obtenerExperienciaLaboral/{id}";
+            endPoint = url + $"api/obtenerExperiencia/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage response = await client.GetAsync(endPoint);

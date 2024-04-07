@@ -1,4 +1,5 @@
-﻿using Coling.Vista.Modelos;
+﻿using Coling.Shared;
+using Coling.Vista.Modelos;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> Insertar(Estudio estudio, string token)
         {
             bool sw = false;
-            endPoint = url + "api/InsertarEstudio";
+            endPoint = url + "api/InsertarEstudios";
             string jsonBody = JsonConvert.SerializeObject(estudio);
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
@@ -64,7 +65,20 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<List<Estudio>> ListarEstado(string token)
         {
-            string endPoint = "api/ListarEstudioEstado";
+            string endPoint = "api/ListarEstudiosEstado";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<Estudio> result = new List<Estudio>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Estudio>>(respuestaCuerpo);
+            }
+            return result;
+        }
+        public async Task<List<Estudio>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = $"api/ListarPorNombreEstudioIns/{nombre}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage response = await client.GetAsync(endPoint);
             List<Estudio> result = new List<Estudio>();
@@ -76,10 +90,24 @@ namespace Coling.Vista.Servicios.Curriculum
             return result;
         }
 
+        public async Task<List<Institucion>> ListarPorNombreInstitucion(string nombre, string token)
+        {
+            string endPoint = $"api/ListarInstitucionPorNombre/{nombre}";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<Institucion> result = new List<Institucion>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Institucion>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
         public async Task<bool> Modificar(Estudio estudio, string token)
         {
             bool sw = false;
-            endPoint = url + "api/ModificarEstudio";
+            endPoint = url + "api/ModificarEstudios";
             string jsonBody = JsonConvert.SerializeObject(estudio);
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");

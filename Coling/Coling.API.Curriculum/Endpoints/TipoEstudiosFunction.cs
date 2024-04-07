@@ -77,6 +77,51 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
 
+        [Function("ListarTipoEstudioEstado")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
+        public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = repos.Getallstatus();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
+        [Function("ListarPorNombreTipoEstudio")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
+        public async Task<HttpResponseData> ListarPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPorNombreTipoEstudio/{nombre}")] HttpRequestData req, string nombre)
+        {
+            try
+            {
+                var lista = repos.ListarPorNombre(nombre);
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
         /*tarea para ahora*/
         [Function("EliminarTipoEstudio")]
         [ColingAuthorize(AplicacionRoles.Admin)]
