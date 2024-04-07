@@ -11,7 +11,7 @@ namespace Coling.Vista.Modelos
     {
         public string NombreProfesion { get; set; }
         public string Idgrado { get; set; }
-        public string Activo { get; set; }
+        public string Estado { get; set; }
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }

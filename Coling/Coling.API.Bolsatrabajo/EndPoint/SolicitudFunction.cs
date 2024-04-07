@@ -1,6 +1,8 @@
 
 using Coling.API.Bolsatrabajo.Contratos.Repositorio;
 using Coling.API.Bolsatrabajo.Modelo;
+using Coling.Utilitarios.Attributes;
+using Coling.Utilitarios.Roles;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -22,6 +24,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ListarSolicitud")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("Listarspec", "Solicitud", Description = " Sirve para listar todas las Solicitudes")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Solicitud>), Description = "Mostrar una lista de Solicitudes")]
 
@@ -41,7 +44,54 @@ namespace Coling.API.Bolsatrabajo.EndPoint
             }
         }
 
+        [Function("ListarSolicitudEstado")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarSolicitud", "Solicitud", Description = "Listar Solicitud")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Solicitud>))]
+        public async Task<HttpResponseData> ListarSolicitudEstado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarSolicitudEstado")] HttpRequestData req)
+        {
+            _logger.LogInformation("Ejecutando azure function para insertar afiliado.");
+            try
+            {
+                var listaafiliado = repos.ListarSolicitudEstado();
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listaafiliado.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+        [Function("ListarSolicitudPorNombre")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarSolicitud", "Solicitud", Description = "Listar Solicitud")]
+        [OpenApiParameter("nombre", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Solicitud>))]
+        public async Task<HttpResponseData> ListarSolicitudPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarSolicitudPorNombre/{nombre}")] HttpRequestData req, string nombre)
+        {
+            _logger.LogInformation("Ejecutando azure function para insertar afiliado.");
+            try
+            {
+                var listaafiliado = repos.ListarSolicitudPorNombre(nombre);
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listaafiliado.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
         [Function("InsertarSolicitud")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("Insertarspec", "Solicitud", Description = " Sirve para listar todas las Solicitudes")]
         [OpenApiRequestBody("application/json", typeof(Solicitud), Description = "Oferta Laboral modelo")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Solicitud), Description = "Insertara la Oferta Laboral.")]
@@ -73,6 +123,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ModificarSolicitud")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("ModificarSolicitud", "Solicitud", Summary = "Modifica una Solicitud existente en el sistema.")]
         [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID de la solicitud", Description = "El ID de la Solicitud a modificar.")]
         [OpenApiRequestBody("application/json", typeof(Solicitud), Description = "Objeto de tipo Solicitud que representa la solicitud a modificar.")]
@@ -105,6 +156,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("EliminarSolicitud")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("Eliminarprec", "Solicitud", Description = "Este endpoint nos sirve para eliminar")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la Solicitud a eliminar")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Solicitud), Description = "Confirmación de eliminación exitosa")]
@@ -136,9 +188,10 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ObtenerSolicitud")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("Listarspec", "Solicitud", Description = " Sirve para obtener la Solicitud")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la solicitud a obtener la solicitud")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Datos de la Solicitud correspondiente al ID proporcionado.")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Solicitud>), Description = "Datos de la Solicitud correspondiente al ID proporcionado.")]
 
         public async Task<HttpResponseData> ObtenerSolicitud(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ObtenerSolicitud/{id}")] HttpRequestData req,

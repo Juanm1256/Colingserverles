@@ -1,0 +1,401 @@
+﻿@page "/solicitudes"
+
+@inject ISolicitudService servicio
+@inject NavigationManager nav
+@inject SweetAlertService sweetAlertService
+
+@if (mostrarModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label>Afiliado:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@solicitud.Afiliado"></InputText>
+                                <ValidationMessage For="@(()=>solicitud.Afiliado)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Nombre Completo:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@solicitud.NombreCompleto"></InputText>
+                                <ValidationMessage For="@(()=>solicitud.NombreCompleto)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fehca Limite:</label>
+                            <div>
+                                <InputDate class="form-control" @bind-Value="@solicitud.FechaPostulacion"></InputDate>
+                                <ValidationMessage For="@(()=>solicitud.FechaPostulacion)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Pretencion Salarial:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@solicitud.PretencionSalarial"></InputText>
+                                <ValidationMessage For="@(()=>solicitud.PretencionSalarial)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Acerca de:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@solicitud.Acercade"></InputText>
+                                <ValidationMessage For="@(()=>solicitud.Acercade)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Oferta:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@solicitud.Oferta"></InputText>
+                                <ValidationMessage For="@(()=>solicitud.Oferta)"></ValidationMessage>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Listar Solicitud</h3>
+
+<div class="form-group row">
+    <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
+        CREAR
+    </button>
+</div>
+
+<div class="form-group row">
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+</div>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><strong>Afiliado</strong></th>
+                <th><strong>Nombre Completo</strong></th>
+                <th><strong>Fecha Postulación</strong></th>
+                <th><strong>Pretención Salarial</strong></th>
+                <th><strong>Areca de</strong></th>
+                <th><strong>Oferta</strong></th>
+                <th><strong>Estado</strong></th>
+                <th><strong>Acciones</strong></th>
+            </tr>
+        </thead>
+        @foreach (var item in SolicitudListaPaginada)
+        {
+            <tr>
+                <td>@item.Afiliado</td>
+                <td>@item.NombreCompleto</td>
+                <td>@item.FechaPostulacion</td>
+                <td>@item.PretencionSalarial</td>
+                <td>@item.Acercade</td>
+                <td>@item.Oferta</td>
+                <td>@item.Estado</td>
+                <td>
+                    @if (item.Estado == "Activo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
+                    }
+                    @if (item.Estado == "Inactivo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
+                    }
+
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+    <!-- Botones de paginación -->
+    <button class="btn btn-primary" disabled="@EsPaginaInicial" @onclick="IrAPaginaAnterior">Anterior</button>
+    <span>Página @paginaActual de @TotalPaginas</span>
+    <button class="btn btn-primary" disabled="@EsPaginaFinal" @onclick="IrAPaginaSiguiente">Siguiente</button>
+</div>
+
+@code {
+
+    private EditContext contextoEdicion;
+    private string modalTitle = "Crear Solicitud";
+    private string modalButtonLabel = "Crear";
+    private Solicitud solicitud = new Solicitud();
+    private bool mostrarModal = false;
+    private string filtroNombre;
+    private List<Solicitud> SolicitudListaPaginada { get; set; } = new List<Solicitud>();
+    private int paginaActual = 1;
+    private int pageSize = 5;
+
+    public List<Solicitud> SolicitudLista { get; set; } = new List<Solicitud>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contextoEdicion = new EditContext(solicitud);
+        await CargarSolicitud();
+    }
+
+    async Task CargarSolicitud()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        SolicitudLista = await servicio.ListarEstado(token);
+        await ActualizarListaPaginada();
+    }
+
+    private async Task ActualizarListaPaginada()
+    {
+        int inicio = (paginaActual - 1) * pageSize;
+        int fin = inicio + pageSize;
+        SolicitudListaPaginada = SolicitudLista.Skip(inicio).Take(pageSize).ToList();
+    }
+
+    private async Task IrAPaginaAnterior()
+    {
+        if (paginaActual > 1)
+        {
+            paginaActual--;
+            await ActualizarListaPaginada();
+        }
+    }
+
+    private async Task IrAPaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas)
+        {
+            paginaActual++;
+            await ActualizarListaPaginada();
+        }
+    }
+
+
+    private bool EsPaginaInicial => paginaActual == 1;
+    private bool EsPaginaFinal => paginaActual == TotalPaginas;
+    private int TotalPaginas => (int)Math.Ceiling((double)SolicitudLista.Count / pageSize);
+    private async Task GuardarCambios()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+
+        if (!string.IsNullOrEmpty(solicitud.Id))
+        {
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas modificar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Modificar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                var respuesta = await servicio.Modificar(solicitud, solicitud.Id, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo modificar", SweetAlertIcon.Error);
+                    return;
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Modificado", "Se modifico correctamente", SweetAlertIcon.Success);
+                }
+            }
+            CerrarModal();
+            await CargarSolicitud();
+        }
+        else
+        {
+            solicitud.Estado = "Activo";
+            var respuesta = await servicio.Insertar(solicitud, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Guardado", "Se guardo correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            SolicitudLista = await servicio.ListarPorNombre(filtroNombre, token);
+            CerrarModal();
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            CerrarModal();
+            await CargarSolicitud();
+        }
+    }
+
+
+    private async Task EliminarSolicitud(string RK)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        solicitud = await servicio.ObtenerPorId(RK, token);
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¿Deseas borrar este registro de institución?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrarlo",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (result.IsConfirmed)
+        {
+            solicitud.Estado = "Eliminado";
+            var respuesta = await servicio.Modificar(solicitud, RK, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo eliminar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Eliminado", "Se Elimino Correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            SolicitudLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarSolicitud();
+        }
+    }
+
+    private void AbrirModalCrear()
+    {
+        solicitud = new Solicitud();
+        contextoEdicion = new EditContext(solicitud);
+        modalTitle = "Crear Solicitud";
+        modalButtonLabel = "Crear";
+        mostrarModal = true;
+    }
+
+    private async Task AbrirModalModificar(string rowKey)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        solicitud = await servicio.ObtenerPorId(rowKey, token);
+        contextoEdicion = new EditContext(solicitud);
+        modalTitle = "Modificar Solicitud";
+        modalButtonLabel = "Guardar Cambios";
+        mostrarModal = true;
+    }
+
+    private async Task cambiarestado(string rowKey, string estado)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        if (estado == "Activo")
+        {
+            solicitud = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas desactivar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Desactivar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                solicitud.Estado = "Inactivo";
+                var respuesta = await servicio.Modificar(solicitud, rowKey, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo desactivar", SweetAlertIcon.Error);
+                    await CargarSolicitud();
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Desactivado", "Se Desactivo correctamente", SweetAlertIcon.Success);
+                    await CargarSolicitud();
+                }
+
+            }
+        }
+        else
+        {
+            solicitud = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas Activar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Activar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                solicitud.Estado = "Activo";
+                var respuesta = await servicio.Modificar(solicitud, rowKey, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo activar", SweetAlertIcon.Error);
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Activado", "Se Activo correctamente", SweetAlertIcon.Success);
+                }
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            SolicitudLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarSolicitud();
+        }
+    }
+    private async Task BuscarPorNombre(ChangeEventArgs e)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        filtroNombre = e.Value.ToString();
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            SolicitudLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarSolicitud();
+            await ActualizarListaPaginada();
+        }
+
+    }
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+    }
+}

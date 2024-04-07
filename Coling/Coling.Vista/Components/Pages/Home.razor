@@ -1,5 +1,59 @@
-﻿@page "/"
+﻿@page "/login"
+@inject IAppService service
+@inject NavigationManager nav;
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<h3>Login</h3>
+<EditForm Model="@loginmodel" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+<div>
+    <div class="from-group">
+        <label>User:</label>
+        <input type="text" @bind-value="loginmodel.UserName" class="form-control" placeholder="Enter User" />
+        <ValidationMessage For="@(()=> loginmodel.UserName)"/>
+    </div>
+    <div class="mt-2 form-group">
+        <label>Password:</label>
+        <input type="text" @bind-value="loginmodel.Password" class="form-control" placeholder="Enter User" />
+        <ValidationMessage For="@(()=> loginmodel.Password)"/>
+    </div>
+    <div class="text-center mt-2">
+        <button class="btn btn-primary" type="submit">Ingresar</button>
+    </div>
+</div>
+</EditForm>
+@code {
+    LoginModel loginmodel = new();
+
+    private async void Submit()
+    {
+        loginmodel.RefrescarToken = true;
+        var response = await service.AuthenticateUser(loginmodel);
+        if (!string.IsNullOrWhiteSpace(response))
+        {
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(response) as JwtSecurityToken;
+            string name = jsontoken.Claims.FirstOrDefault(f => f.Type == "usuario")?.Value;
+            string rol = jsontoken.Claims.FirstOrDefault(f => f.Type == "rol").Value;
+            string estado = jsontoken.Claims.FirstOrDefault(f => f.Type == "estado").Value;
+
+            var detalleususuario = new Detalleuser
+                {
+                    usuario = name,
+                    rol = rol,
+                    Token = response,
+                    Estado = estado
+                };
+            string userbasic = JsonConvert.SerializeObject(detalleususuario);
+
+            await SecureStorage.SetAsync(nameof(Settings.detalleuser), userbasic);
+            Settings.detalleuser = detalleususuario;
+
+            nav.NavigateTo("/dashboard");
+        }
+        else
+        {
+            await App.Current.MainPage.DisplayAlert("Opps", "Invalid user", "Ok");
+        }
+    }
+}

@@ -13,6 +13,8 @@ namespace Coling.API.Curriculum.Contrato.Repositorios
         public Task<bool> UpdateIns(GradoAcademico gradoacademico);
         public Task<bool> Delete(string partitionkey, string rowkey);
         public Task<List<GradoAcademico>> Getall();
+        public Task<List<GradoAcademico>> Getallstatus();
+        public Task<List<GradoAcademico>> ListarPorNombre(string nombre);
         public Task<GradoAcademico> Get(string id);
     }
 }

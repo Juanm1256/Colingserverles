@@ -1,0 +1,427 @@
+﻿@page "/ofertalaboral"
+
+@inject IOfertaLaboralService servicio
+@inject NavigationManager nav
+@inject SweetAlertService sweetAlertService
+
+@if (mostrarModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label>Nombre Tipo Institucion:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.tipoinstitucion"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.tipoinstitucion)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fecha Oferta:</label>
+                            <div>
+                                <InputDate class="form-control" @bind-Value="@ofertaLaboral.FechaOferta"></InputDate>
+                                <ValidationMessage For="@(()=>ofertaLaboral.FechaOferta)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fehca Limite:</label>
+                            <div>
+                                <InputDate class="form-control" @bind-Value="@ofertaLaboral.FechaLimite"></InputDate>
+                                <ValidationMessage For="@(()=>ofertaLaboral.FechaLimite)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Descripción:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.Descripcion"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.Descripcion)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Titulo Cargo:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.TituloCargo"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.TituloCargo)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Tipo Contrato:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.TipoContrato"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.TipoContrato)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Tipo Trabajo:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.TipoTrabajo"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.TipoTrabajo)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Area:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.Area"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.Area)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Caracteristicas:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@ofertaLaboral.Caracteristicas"></InputText>
+                                <ValidationMessage For="@(()=>ofertaLaboral.Caracteristicas)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Listar OfertaLaboral</h3>
+
+<div class="form-group row">
+    <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
+        CREAR
+    </button>
+</div>
+
+<div class="form-group row">
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+</div>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><strong>Tipo Institucion</strong></th>
+                <th><strong>Fecha Oferta</strong></th>
+                <th><strong>Fecha Limite</strong></th>
+                <th><strong>Descripcion</strong></th>
+                <th><strong>Titulo Cargo</strong></th>
+                <th><strong>Tipo Contrato</strong></th>
+                <th><strong>TIpo Trabajo</strong></th>
+                <th><strong>Area</strong></th>
+                <th><strong>Caracteristicas</strong></th>
+                <th><strong>Estado</strong></th>
+                <th><strong>Acciones</strong></th>
+            </tr>
+        </thead>
+        @foreach (var item in OfertaLaboralListaPaginada)
+        {
+            <tr>
+                <td>@item.tipoinstitucion</td>
+                <td>@item.FechaOferta</td>
+                <td>@item.FechaLimite</td>
+                <td>@item.Descripcion</td>
+                <td>@item.TituloCargo</td>
+                <td>@item.TipoContrato</td>
+                <td>@item.TipoTrabajo</td>
+                <td>@item.Area</td>
+                <td>@item.Caracteristicas</td>
+                <td>@item.Estado</td>
+                <td>
+                    @if (item.Estado == "Activo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
+                    }
+                    @if (item.Estado == "Inactivo")
+                    {
+                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
+                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
+                    }
+
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+    <!-- Botones de paginación -->
+    <button class="btn btn-primary" disabled="@EsPaginaInicial" @onclick="IrAPaginaAnterior">Anterior</button>
+    <span>Página @paginaActual de @TotalPaginas</span>
+    <button class="btn btn-primary" disabled="@EsPaginaFinal" @onclick="IrAPaginaSiguiente">Siguiente</button>
+</div>
+
+@code {
+
+    private EditContext contextoEdicion;
+    private string modalTitle = "Crear OfertaLaboral";
+    private string modalButtonLabel = "Crear";
+    private OfertaLaboral ofertaLaboral = new OfertaLaboral();
+    private bool mostrarModal = false;
+    private string filtroNombre;
+    private List<OfertaLaboral> OfertaLaboralListaPaginada { get; set; } = new List<OfertaLaboral>();
+    private int paginaActual = 1;
+    private int pageSize = 5;
+
+    public List<OfertaLaboral> OfertaLaboralLista { get; set; } = new List<OfertaLaboral>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contextoEdicion = new EditContext(ofertaLaboral);
+        await CargarOfertaLaboral();
+    }
+
+    async Task CargarOfertaLaboral()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        OfertaLaboralLista = await servicio.ListarEstado(token);
+        await ActualizarListaPaginada();
+    }
+
+    private async Task ActualizarListaPaginada()
+    {
+        int inicio = (paginaActual - 1) * pageSize;
+        int fin = inicio + pageSize;
+        OfertaLaboralListaPaginada = OfertaLaboralLista.Skip(inicio).Take(pageSize).ToList();
+    }
+
+    private async Task IrAPaginaAnterior()
+    {
+        if (paginaActual > 1)
+        {
+            paginaActual--;
+            await ActualizarListaPaginada();
+        }
+    }
+
+    private async Task IrAPaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas)
+        {
+            paginaActual++;
+            await ActualizarListaPaginada();
+        }
+    }
+
+
+    private bool EsPaginaInicial => paginaActual == 1;
+    private bool EsPaginaFinal => paginaActual == TotalPaginas;
+    private int TotalPaginas => (int)Math.Ceiling((double)OfertaLaboralLista.Count / pageSize);
+    private async Task GuardarCambios()
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+
+        if (!string.IsNullOrEmpty(ofertaLaboral.Id))
+        {
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas modificar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Modificar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                var respuesta = await servicio.Modificar(ofertaLaboral, ofertaLaboral.Id, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo modificar", SweetAlertIcon.Error);
+                    return;
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Modificado", "Se modifico correctamente", SweetAlertIcon.Success);
+                }
+            }
+            CerrarModal();
+            await CargarOfertaLaboral();
+        }
+        else
+        {
+            ofertaLaboral.Estado = "Activo";
+            var respuesta = await servicio.Insertar(ofertaLaboral, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Guardado", "Se guardo correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            OfertaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            CerrarModal();
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            CerrarModal();
+            await CargarOfertaLaboral();
+        }
+    }
+
+
+    private async Task EliminarOfertaLaboral(string RK)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        ofertaLaboral = await servicio.ObtenerPorId(RK, token);
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¿Deseas borrar este registro de institución?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrarlo",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (result.IsConfirmed)
+        {
+            ofertaLaboral.Estado = "Eliminado";
+            var respuesta = await servicio.Modificar(ofertaLaboral, RK, token);
+            if (!respuesta)
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo eliminar", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Eliminado", "Se Elimino Correctamente", SweetAlertIcon.Success);
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            OfertaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarOfertaLaboral();
+        }
+    }
+
+    private void AbrirModalCrear()
+    {
+        ofertaLaboral = new OfertaLaboral();
+        contextoEdicion = new EditContext(ofertaLaboral);
+        modalTitle = "Crear OfertaLaboral";
+        modalButtonLabel = "Crear";
+        mostrarModal = true;
+    }
+
+    private async Task AbrirModalModificar(string rowKey)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        ofertaLaboral = await servicio.ObtenerPorId(rowKey, token);
+        contextoEdicion = new EditContext(ofertaLaboral);
+        modalTitle = "Modificar OfertaLaboral";
+        modalButtonLabel = "Guardar Cambios";
+        mostrarModal = true;
+    }
+
+    private async Task cambiarestado(string rowKey, string estado)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        if (estado == "Activo")
+        {
+            ofertaLaboral = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas desactivar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Desactivar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                ofertaLaboral.Estado = "Inactivo";
+                var respuesta = await servicio.Modificar(ofertaLaboral, rowKey, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo desactivar", SweetAlertIcon.Error);
+                    await CargarOfertaLaboral();
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Desactivado", "Se Desactivo correctamente", SweetAlertIcon.Success);
+                    await CargarOfertaLaboral();
+                }
+
+            }
+        }
+        else
+        {
+            ofertaLaboral = await servicio.ObtenerPorId(rowKey, token);
+
+            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Estás seguro?",
+                    Text = "¿Deseas Activar este registro de institución?",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, Activar",
+                    CancelButtonText = "No, cancelar",
+                });
+
+            if (result.IsConfirmed)
+            {
+                ofertaLaboral.Estado = "Activo";
+                var respuesta = await servicio.Modificar(ofertaLaboral, rowKey, token);
+                if (!respuesta)
+                {
+                    await sweetAlertService.FireAsync("Error", "No se pudo activar", SweetAlertIcon.Error);
+                }
+                else
+                {
+                    await sweetAlertService.FireAsync("Activado", "Se Activo correctamente", SweetAlertIcon.Success);
+                }
+            }
+        }
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            OfertaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarOfertaLaboral();
+        }
+    }
+    private async Task BuscarPorNombre(ChangeEventArgs e)
+    {
+        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        filtroNombre = e.Value.ToString();
+        if (!string.IsNullOrEmpty(filtroNombre))
+        {
+            OfertaLaboralLista = await servicio.ListarPorNombre(filtroNombre, token);
+            await ActualizarListaPaginada();
+        }
+        else
+        {
+            await CargarOfertaLaboral();
+            await ActualizarListaPaginada();
+        }
+
+    }
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+    }
+}

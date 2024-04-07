@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager nav;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Coling.Vista</a>
     </div>
@@ -6,27 +8,123 @@
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
+
+
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/personas">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Personas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/instituciones">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Instituciones
-            </NavLink>
-        </div>
+        @if (Settings.detalleuser !=null)
+        {
+            @if (Settings.detalleuser.rol.Equals("Admin"))
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/personas">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Personas
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/afiliados">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Afiliados
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/direcciones">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Direccion
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/personatiposocial">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Persona Tipo Social
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/profesionafiliado">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion Afiliado
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/telefonos">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Telefono
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/tiposocial">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tipo Social
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/ofertalaboral">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/solicitudes">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Postulaciones
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/solicitudes">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Postulaciones
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="#" @onclick="SignOut">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cerrar Cession
+                    </NavLink>
+                </div>
+
+            }
+            @if (Settings.detalleuser.rol == "Secretaria")
+            {
+                
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" @onclick="TogglePublicationType">
+                        
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+                    </NavLink>
+                </div>
+                @if (tok==true)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="counter">
+                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+                        </NavLink>
+                    </div>
+                }
+            }
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="#" @onclick="SignOut">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cerrar Cession
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
+
+@code{
+
+    bool tok = false;
+
+    private void TogglePublicationType()
+    {
+        if (tok)
+        {
+            tok = false;
+        }else
+        {
+            tok = true;
+        }
+    }
+
+    private void SignOut() {
+        SecureStorage.RemoveAll();
+        Settings.detalleuser = null;
+
+        nav.NavigateTo("/login");
+    }
+}

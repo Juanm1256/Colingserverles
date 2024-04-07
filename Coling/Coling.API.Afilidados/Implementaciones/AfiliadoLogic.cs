@@ -48,6 +48,20 @@ namespace Coling.API.Afilidados.Implementaciones
             return listar;
         }
 
+        public async Task<List<Afiliado>> ListarAfiliadoEstado()
+        {
+            var listar = await contexto.Afiliados.ToListAsync();
+            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
+            return respuesta.ToList();
+        }
+
+        public async Task<List<Afiliado>> ListarAfiliadoPorNombre(string nombre)
+        {
+            var listar =  await contexto.Afiliados.Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
+            return listar;
+        }
+
+
         public async Task<bool> ModificarAfiliado(Afiliado afiliado, int id)
         {
             bool sw = false;

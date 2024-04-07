@@ -13,6 +13,8 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> ModificarPersonaTipoSocial(PersonaTipoSocial social, int id);
         public Task<bool> EliminarPersonaTipoSocial(int id);
         public Task<List<PersonaTipoSocial>> ListarPersonaTipoSocialTodos();
+        public Task<List<PersonaTipoSocial>> ListarPersonaTipoSocialEstado();
+        public Task<List<PersonaTipoSocial>> ListarPersonaTipoSocialPorNombre(string nombre);
         public Task<PersonaTipoSocial> ObtenerPersonaTipoSocialById(int id);
     }
 }

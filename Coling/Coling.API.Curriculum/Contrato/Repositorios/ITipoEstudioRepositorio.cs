@@ -13,6 +13,8 @@ namespace Coling.API.Curriculum.Contrato.Repositorios
         public Task<bool> UpdateIns(TipoEstudio tipoEstudio);
         public Task<bool> Delete(string partitionkey, string rowkey);
         public Task<List<TipoEstudio>> Getall();
+        public Task<List<TipoEstudio>> Getallstatus();
+        public Task<List<TipoEstudio>> ListarPorNombre(string nombre);
         public Task<TipoEstudio> Get(string id);
     }
 }

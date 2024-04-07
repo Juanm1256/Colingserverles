@@ -58,6 +58,18 @@ namespace Coling.API.Bolsatrabajo.Repositorio
             return lista;
         }
 
+        public async Task<List<Solicitud>> ListarSolicitudEstado()
+        {
+            var listar = await collection.FindAsync(d => d.Estado == "Activo" || d.Estado == "Inactivo");
+            return listar.ToList();
+        }
+
+        public async Task<List<Solicitud>> ListarSolicitudPorNombre(string nombre)
+        {
+            var listar = await collection.FindAsync(x => x.Afiliado == nombre);
+            return listar.ToList();
+        }
+
         public async Task<bool> Insertar(Solicitud solicitud)
         {
             try

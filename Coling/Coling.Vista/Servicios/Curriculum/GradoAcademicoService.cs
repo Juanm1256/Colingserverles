@@ -23,7 +23,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> Eliminar(string id, string token)
         {
             bool sw = false;
-            endPoint = url + $"api/eliminarGradoAcademico/{id}";
+            endPoint = url + $"api/eliminarGrado/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage respuesta = await client.DeleteAsync(endPoint);
             if (respuesta.IsSuccessStatusCode)
@@ -65,7 +65,21 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<List<GradoAcademico>> ListarEstado(string token)
         {
-            string endPoint = "api/ListarGradoAcademicoEstado";
+            string endPoint = "api/ListarGradoAEstado";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<GradoAcademico> result = new List<GradoAcademico>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<GradoAcademico>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
+        public async Task<List<GradoAcademico>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = $"api/ListarPorNombreGradoA/{nombre}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage response = await client.GetAsync(endPoint);
             List<GradoAcademico> result = new List<GradoAcademico>();
@@ -94,7 +108,7 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<GradoAcademico> ObtenerPorId(string id, string token)
         {
-            endPoint = url + $"api/obtenerGradoAcademico/{id}";
+            endPoint = url + $"api/obtenerGrado/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage response = await client.GetAsync(endPoint);

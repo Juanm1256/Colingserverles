@@ -83,7 +83,7 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
         {
             List<Institucion> lista = new List<Institucion>();
             var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
-            var filtro = $"PartitionKey eq 'Educacion' and Nombre eq '{nombre}'";
+            var filtro = $"PartitionKey eq 'Educacion' and Nombre ge '{nombre}' and Estado ne 'Eliminado'";
             await foreach (Institucion institucion in tablaCliente.QueryAsync<Institucion>(filter: filtro))
             {
                 lista.Add(institucion);

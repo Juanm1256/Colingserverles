@@ -23,7 +23,7 @@ namespace Coling.Vista.Servicios.Curriculum
         public async Task<bool> Eliminar(string id, string token)
         {
             bool sw = false;
-            endPoint = url + $"api/eliminarTipoEstudio/{id}";
+            endPoint = url + $"api/eliminarTipo/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage respuesta = await client.DeleteAsync(endPoint);
             if (respuesta.IsSuccessStatusCode)
@@ -79,6 +79,20 @@ namespace Coling.Vista.Servicios.Curriculum
             return result;
         }
 
+        public async Task<List<TipoEstudio>> ListarPorNombre(string nombre, string token)
+        {
+            string endPoint = $"api/ListarPorNombreTipoEstudio/{nombre}";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<TipoEstudio> result = new List<TipoEstudio>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<TipoEstudio>>(respuestaCuerpo);
+            }
+            return result;
+        }
+
         public async Task<bool> Modificar(TipoEstudio estudio, string token)
         {
             bool sw = false;
@@ -96,7 +110,7 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<TipoEstudio> ObtenerPorId(string id, string token)
         {
-            endPoint = url + $"api/obtenerTipoEstudio/{id}";
+            endPoint = url + $"api/obtenerTipo/{id}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage response = await client.GetAsync(endPoint);
