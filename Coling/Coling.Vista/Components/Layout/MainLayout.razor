@@ -2,13 +2,13 @@
 
 
 <div class="page">
-    @if (Settings.detalleuser != null)
+    @if (Settings.detalleuser != null && Settings.detalleuser.Estado == "Activo")
     {
         <div class="sidebar">
              <NavMenu />
         </div>
     }
-    @if (Settings.detalleuser == null)
+    @if (Settings.detalleuser == null || Settings.detalleuser.Estado != "Activo" )
     {
         <Home/>
     }

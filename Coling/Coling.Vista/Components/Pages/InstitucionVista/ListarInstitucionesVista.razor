@@ -70,29 +70,31 @@
                 <th><strong>Acciones</strong></th>
             </tr>
         </thead>
-        @foreach (var item in InstitucionListaPaginada)
-        {
-            <tr>
-                <td>@item.Nombre</td>
-                <td>@item.Direccion</td>
-                <td>@item.Estado</td>
-                <td>
-                    @if (item.Estado == "Activo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Desactivar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button>
-                    }
-                    @if (item.Estado == "Inactivo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Activar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button>
-                    }
-                    
-                </td>
-            </tr>
-        }
+        <tbody>
+            @foreach (var item in InstitucionListaPaginada)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Direccion</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        @if (item.Estado == "Activo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Desactivar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button>
+                        }
+                        @if (item.Estado == "Inactivo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Activar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarInstitucion(item.RowKey)">Eliminar</button>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
 </div>
 <div>
@@ -113,18 +115,40 @@
     private List<Institucion> InstitucionListaPaginada { get; set; } = new List<Institucion>();
     private int paginaActual = 1;
     private int pageSize = 5;
+    private string token = "";
 
     public List<Institucion> InstitucionLista { get; set; } = new List<Institucion>();
 
     protected override async Task OnInitializedAsync()
     {
-        contextoEdicion = new EditContext(institucion);
-        await CargarInstituciones();
+        string userd = await SecureStorage.GetAsync(nameof(Settings.detalleuser));
+        if (!string.IsNullOrWhiteSpace(userd))
+        {
+            var userdt = JsonConvert.DeserializeObject<Detalleuser>(userd);
+
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
+            if (jsontoken.ValidTo < DateTime.UtcNow)
+            {
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                Settings.detalleuser = userdt;
+                token = Settings.detalleuser.Token;
+                contextoEdicion = new EditContext(institucion);
+                await CargarInstituciones();
+            }
+        }
+        else
+        {
+            nav.NavigateTo("/login");
+        }
     }
 
     async Task CargarInstituciones()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         InstitucionLista = await servicioinstitucion.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -160,7 +184,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)InstitucionLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
 
         if (!string.IsNullOrEmpty(institucion.RowKey))
         {
@@ -221,7 +245,7 @@
 
     private async Task EliminarInstitucion(string RK)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         institucion = await servicioinstitucion.ObtenerInstitucionPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -269,7 +293,7 @@
 
     private async Task AbrirModalModificar(string rowKey)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         institucion = await servicioinstitucion.ObtenerInstitucionPorId(rowKey, token);
         contextoEdicion = new EditContext(institucion);
         modalTitle = "Modificar Institución";
@@ -279,7 +303,7 @@
 
     private async Task cambiarestado(string rowKey, string estado)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         if (estado == "Activo")
         {
             institucion = await servicioinstitucion.ObtenerInstitucionPorId(rowKey, token);
@@ -350,7 +374,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {

@@ -14,7 +14,7 @@ Loading...
 
             var hadler = new JwtSecurityTokenHandler();
             var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
-            if (jsontoken.ValidTo < DateTime.UtcNow)
+            if (jsontoken.ValidTo < DateTime.UtcNow || userdt.Estado!="Activo")
             {
                 nav.NavigateTo("/login");
             }else

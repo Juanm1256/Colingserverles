@@ -73,30 +73,32 @@
                 <th><strong>Acciones</strong></th>
             </tr>
         </thead>
-        @foreach (var item in PersonaTipoSocialListaPaginada)
-        {
-            <tr>
-                <td>@item.Idtiposocial</td>
-                <td>@item.Idpersona</td>
-                <td>@item.Descripcion</td>
-                <td>@item.Estado</td>
-                <td>
-                    @if (item.Estado == "Activo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarPersonaTipoSocial(item.Id)">Eliminar</button>
-                    }
-                    @if (item.Estado == "Inactivo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarPersonaTipoSocial(item.Id)">Eliminar</button>
-                    }
+        <tbody>
+            @foreach (var item in PersonaTipoSocialListaPaginada)
+            {
+                <tr>
+                    <td>@item.Idtiposocial</td>
+                    <td>@item.Idpersona</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        @if (item.Estado == "Activo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarPersonaTipoSocial(item.Id)">Eliminar</button>
+                        }
+                        @if (item.Estado == "Inactivo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarPersonaTipoSocial(item.Id)">Eliminar</button>
+                        }
 
-                </td>
-            </tr>
-        }
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
 </div>
 <div>
@@ -117,18 +119,40 @@
     private List<PersonaTipoSocial> PersonaTipoSocialListaPaginada { get; set; } = new List<PersonaTipoSocial>();
     private int paginaActual = 1;
     private int pageSize = 5;
+    private string token = "";
 
     public List<PersonaTipoSocial> PersonaTipoSocialLista { get; set; } = new List<PersonaTipoSocial>();
 
     protected override async Task OnInitializedAsync()
     {
-        contextoEdicion = new EditContext(direccion);
-        await CargarPersonaTipoSocial();
+        string userd = await SecureStorage.GetAsync(nameof(Settings.detalleuser));
+        if (!string.IsNullOrWhiteSpace(userd))
+        {
+            var userdt = JsonConvert.DeserializeObject<Detalleuser>(userd);
+
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
+            if (jsontoken.ValidTo < DateTime.UtcNow)
+            {
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                Settings.detalleuser = userdt;
+                token = Settings.detalleuser.Token;
+                contextoEdicion = new EditContext(direccion);
+                await CargarPersonaTipoSocial();
+            }
+        }
+        else
+        {
+            nav.NavigateTo("/login");
+        }
     }
 
     async Task CargarPersonaTipoSocial()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         PersonaTipoSocialLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -164,7 +188,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)PersonaTipoSocialLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
 
         if (direccion.Id > 0)
         {
@@ -224,7 +248,7 @@
 
     private async Task EliminarPersonaTipoSocial(int RK)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         direccion = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -272,7 +296,7 @@
 
     private async Task AbrirModalModificar(int id)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         direccion = await servicio.ObtenerPorId(id, token);
         contextoEdicion = new EditContext(direccion);
         modalTitle = "Modificar Persona Tipo Social";
@@ -282,7 +306,7 @@
 
     private async Task cambiarestado(int id, string estado)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         if (estado == "Activo")
         {
             direccion = await servicio.ObtenerPorId(id, token);
@@ -354,7 +378,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {
