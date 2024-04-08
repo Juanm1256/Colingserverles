@@ -56,6 +56,21 @@ namespace Coling.Repositorio.Implementacion
             return Encriptado;
         }
 
+        public async Task<bool> Insertar(int Idusuario, string usuariox, string passwordx, string rol, string estado)
+        {
+            string passEncriptado = await EncriptarPassword(passwordx);
+            string consulta = "INSERT INTO Usuario (idusuario, nombreuser, password, rol, estado) VALUES (@Idusuario ,@usuario, @password, @rol, @estado)";
+            bool exito = conexion.Insertardatas(consulta, Idusuario, usuariox, passEncriptado, rol, estado);
+            if (exito)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public Task<bool> ValidarToken(string token)
         {
             throw new NotImplementedException();
