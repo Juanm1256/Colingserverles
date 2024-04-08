@@ -4,16 +4,17 @@
 @inject NavigationManager nav
 @inject SweetAlertService sweetAlertService
 
-@if (mostrarModal)
+@if (mostrarModal == "Crear")
 {
     <div class="modal fade show" style="display: block;" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
                     <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
                     <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
                         <DataAnnotationsValidator />
                         <div class="mb-3">
@@ -45,6 +46,39 @@
                             </div>
                         </div>
 
+                    </EditForm>
+                   
+                    <EditForm EditContext="contextoEdiciondir" OnValidSubmit="GuardarCambios">
+                        <div class="mb-3">
+                            <label>Descripción Dirección:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@direccion.Descripcion"></InputText>
+                                <ValidationMessage For="@(()=>direccion.Descripcion)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicionuser" OnValidSubmit="GuardarCambios">
+                        <div class="mb-3">
+                            <label>Nombre Usuario:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@regisuser.UserName"></InputText>
+                                <ValidationMessage For="@(()=>regisuser.UserName)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Password:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@regisuser.Password"></InputText>
+                                <ValidationMessage For="@(()=>regisuser.Password)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Rol:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@regisuser.Rol"></InputText>
+                                <ValidationMessage For="@(()=>regisuser.Rol)"></ValidationMessage>
+                            </div>
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
                             <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
@@ -54,6 +88,59 @@
             </div>
         </div>
     </div>
+}
+else
+{
+    @if (mostrarModal=="Modificar")
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                        <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label>Nombre Persona:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@persona.Nombre"></InputText>
+                                    <ValidationMessage For="@(()=>persona.Nombre)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Apellidos:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@persona.Apellidos"></InputText>
+                                    <ValidationMessage For="@(()=>persona.Apellidos)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Fecha Nacimiento:</label>
+                                <div>
+                                    <InputDate class="form-control" @bind-Value="@persona.FechaNacimiento"></InputDate>
+                                    <ValidationMessage For="@(()=>persona.FechaNacimiento)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Foto:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@persona.Foto"></InputText>
+                                    <ValidationMessage For="@(()=>persona.Foto)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </EditForm>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <h3>Listar Persona</h3>
@@ -119,10 +206,18 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionper;
+    private EditContext contextoEdiciontel;
+    private EditContext contextoEdiciondir;
+    private EditContext contextoEdicionuser;
     private string modalTitle = "Crear Persona";
     private string modalButtonLabel = "Crear";
     private Persona persona = new Persona();
-    private bool mostrarModal = false;
+    private Telefono telefono = new Telefono();
+    private Direccion direccion = new Direccion();
+    private RegistrarUsuario regisuser = new RegistrarUsuario();
+    private PerTelDir registroperteldir = new PerTelDir();
+    private string mostrarModal = "";
     private string filtroNombre;
     private List<Persona> PersonaListaPaginada { get; set; } = new List<Persona>();
     private int paginaActual = 1;
@@ -149,6 +244,9 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(persona);
+                contextoEdiciontel = new EditContext(telefono);
+                contextoEdiciondir = new EditContext(direccion);
+                contextoEdicionuser = new EditContext(regisuser);
                 await CargarPersona();
             }
         }
@@ -161,7 +259,7 @@
 
     async Task CargarPersona()
     {
-       
+
         PersonaLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -195,14 +293,17 @@
     private bool EsPaginaInicial => paginaActual == 1;
     private bool EsPaginaFinal => paginaActual == TotalPaginas;
     private int TotalPaginas => (int)Math.Ceiling((double)PersonaLista.Count / pageSize);
+
+    /*REGISTRAR Y MODIFICAR */
     private async Task GuardarCambios()
     {
         if (persona.Id>0)
         {
+            /*MODIFICAR*/
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas modificar este registro de institución?",
+                    Text = "¿Deseas modificar este registro de Persona?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Modificar",
@@ -227,8 +328,14 @@
         }
         else
         {
+            /*REGISTRAR PERSONA*/
             persona.Estado = "Activo";
-            var respuesta = await servicio.Insertar(persona, token);
+            regisuser.Estado = "Activo";
+            registroperteldir.personas = persona;
+            registroperteldir.telefonos = telefono;
+            registroperteldir.direccions = direccion;
+            registroperteldir.registrarUsuario = regisuser;
+            var respuesta = await servicio.InsertarAll(registroperteldir, token);
             if (!respuesta)
             {
                 await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
@@ -259,7 +366,7 @@
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Estás seguro?",
-                Text = "¿Deseas borrar este registro de institución?",
+                Text = "¿Deseas borrar este registro de Persona?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Sí, borrarlo",
@@ -294,10 +401,16 @@
     private void AbrirModalCrear()
     {
         persona = new Persona();
+        telefono = new Telefono();
+        direccion = new Direccion();
+        regisuser = new RegistrarUsuario();
         contextoEdicion = new EditContext(persona);
+        contextoEdiciontel = new EditContext(telefono);
+        contextoEdiciondir = new EditContext(direccion);
+        contextoEdicionuser = new EditContext(regisuser);
         modalTitle = "Crear Persona";
         modalButtonLabel = "Crear";
-        mostrarModal = true;
+        mostrarModal = "Crear";
     }
 
     private async Task AbrirModalModificar(int id)
@@ -306,7 +419,7 @@
         contextoEdicion = new EditContext(persona);
         modalTitle = "Modificar Persona";
         modalButtonLabel = "Guardar Cambios";
-        mostrarModal = true;
+        mostrarModal = "Modificar";
     }
 
     private async Task cambiarestado(int id, string estado)
@@ -397,6 +510,6 @@
     }
     private void CerrarModal()
     {
-        mostrarModal = false;
+        mostrarModal = "";
     }
 }
