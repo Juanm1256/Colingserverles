@@ -96,33 +96,35 @@
                 <th><strong>Acciones</strong></th>
             </tr>
         </thead>
-        @foreach (var item in SolicitudListaPaginada)
-        {
-            <tr>
-                <td>@item.Afiliado</td>
-                <td>@item.NombreCompleto</td>
-                <td>@item.FechaPostulacion</td>
-                <td>@item.PretencionSalarial</td>
-                <td>@item.Acercade</td>
-                <td>@item.Oferta</td>
-                <td>@item.Estado</td>
-                <td>
-                    @if (item.Estado == "Activo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
-                    }
-                    @if (item.Estado == "Inactivo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
-                    }
+        <tbody>
+            @foreach (var item in SolicitudListaPaginada)
+            {
+                <tr>
+                    <td>@item.Afiliado</td>
+                    <td>@item.NombreCompleto</td>
+                    <td>@item.FechaPostulacion</td>
+                    <td>@item.PretencionSalarial</td>
+                    <td>@item.Acercade</td>
+                    <td>@item.Oferta</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        @if (item.Estado == "Activo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
+                        }
+                        @if (item.Estado == "Inactivo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarSolicitud(item.Id)">Eliminar</button>
+                        }
 
-                </td>
-            </tr>
-        }
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
 </div>
 <div>
@@ -143,18 +145,40 @@
     private List<Solicitud> SolicitudListaPaginada { get; set; } = new List<Solicitud>();
     private int paginaActual = 1;
     private int pageSize = 5;
+    private string token = "";
 
     public List<Solicitud> SolicitudLista { get; set; } = new List<Solicitud>();
 
     protected override async Task OnInitializedAsync()
     {
-        contextoEdicion = new EditContext(solicitud);
-        await CargarSolicitud();
+        string userd = await SecureStorage.GetAsync(nameof(Settings.detalleuser));
+        if (!string.IsNullOrWhiteSpace(userd))
+        {
+            var userdt = JsonConvert.DeserializeObject<Detalleuser>(userd);
+
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
+            if (jsontoken.ValidTo < DateTime.UtcNow)
+            {
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                Settings.detalleuser = userdt;
+                token = Settings.detalleuser.Token;
+                contextoEdicion = new EditContext(solicitud);
+                await CargarSolicitud();
+            }
+        }
+        else
+        {
+            nav.NavigateTo("/login");
+        }
     }
 
     async Task CargarSolicitud()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         SolicitudLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -190,7 +214,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)SolicitudLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
 
         if (!string.IsNullOrEmpty(solicitud.Id))
         {
@@ -250,7 +274,7 @@
 
     private async Task EliminarSolicitud(string RK)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         solicitud = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -298,7 +322,7 @@
 
     private async Task AbrirModalModificar(string rowKey)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         solicitud = await servicio.ObtenerPorId(rowKey, token);
         contextoEdicion = new EditContext(solicitud);
         modalTitle = "Modificar Solicitud";
@@ -308,7 +332,7 @@
 
     private async Task cambiarestado(string rowKey, string estado)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         if (estado == "Activo")
         {
             solicitud = await servicio.ObtenerPorId(rowKey, token);
@@ -380,7 +404,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {

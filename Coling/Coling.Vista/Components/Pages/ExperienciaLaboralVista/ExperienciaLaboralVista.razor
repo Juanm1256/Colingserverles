@@ -88,32 +88,34 @@
                 <th><strong>Acciones</strong></th>
             </tr>
         </thead>
-        @foreach (var item in ExperienciaLaboralListaPaginada)
-        {
-            <tr>
-                <td>@item.Afiliado</td>
-                <td>@item.Institucion</td>
-                <td>@item.CargoTitulo</td>
-                <td>@item.FechaInicio</td>
-                <td>@item.FechaFinal</td>
-                <td>@item.Estado</td>
-                <td>
-                    @if (item.Estado == "Activo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Desactivar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
-                    }
-                    @if (item.Estado == "Inactivo")
-                    {
-                        <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Activar</button>
-                        <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
-                    }
+        <tbody>
+            @foreach (var item in ExperienciaLaboralListaPaginada)
+            {
+                <tr>
+                    <td>@item.Afiliado</td>
+                    <td>@item.Institucion</td>
+                    <td>@item.CargoTitulo</td>
+                    <td>@item.FechaInicio</td>
+                    <td>@item.FechaFinal</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        @if (item.Estado == "Activo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Desactivar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
+                        }
+                        @if (item.Estado == "Inactivo")
+                        {
+                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.RowKey, item.Estado)">Activar</button>
+                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.RowKey)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarExperienciaLaboral(item.RowKey)">Eliminar</button>
+                        }
 
-                </td>
-            </tr>
-        }
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
 </div>
 <div>
@@ -131,6 +133,7 @@
     private ExperienciaLaboral experiencialaboral = new ExperienciaLaboral();
     private bool mostrarModal = false;
     private string filtroNombre;
+    private string token="";
     private List<ExperienciaLaboral> ExperienciaLaboralListaPaginada { get; set; } = new List<ExperienciaLaboral>();
     private int paginaActual = 1;
     private int pageSize = 5;
@@ -139,13 +142,34 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contextoEdicion = new EditContext(experiencialaboral);
-        await CargarExperienciaLaboral();
+        string userd = await SecureStorage.GetAsync(nameof(Settings.detalleuser));
+        if (!string.IsNullOrWhiteSpace(userd))
+        {
+            var userdt = JsonConvert.DeserializeObject<Detalleuser>(userd);
+
+            var hadler = new JwtSecurityTokenHandler();
+            var jsontoken = hadler.ReadToken(userdt.Token) as JwtSecurityToken;
+            if (jsontoken.ValidTo < DateTime.UtcNow)
+            {
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                Settings.detalleuser = userdt;
+                token = Settings.detalleuser.Token;
+                contextoEdicion = new EditContext(experiencialaboral);
+                await CargarExperienciaLaboral();
+            }
+        }
+        else
+        {
+            nav.NavigateTo("/login");
+        }
     }
 
     async Task CargarExperienciaLaboral()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         ExperienciaLaboralLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -181,7 +205,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)ExperienciaLaboralLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
 
         if (!string.IsNullOrEmpty(experiencialaboral.RowKey))
         {
@@ -242,7 +266,7 @@
 
     private async Task EliminarExperienciaLaboral(string RK)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         experiencialaboral = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -290,7 +314,7 @@
 
     private async Task AbrirModalModificar(string rowKey)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         experiencialaboral = await servicio.ObtenerPorId(rowKey, token);
         contextoEdicion = new EditContext(experiencialaboral);
         modalTitle = "Modificar ExperienciaLaboral";
@@ -300,7 +324,7 @@
 
     private async Task cambiarestado(string rowKey, string estado)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         if (estado == "Activo")
         {
             experiencialaboral = await servicio.ObtenerPorId(rowKey, token);
@@ -372,7 +396,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiSnVhbiIsInJvbCI6IkFkbWluIiwiZXN0YWRvIjoiQWN0aXZvIiwiZXhwIjoxNzEyNTE5OTkwfQ.3aq-Fxj8vdmP5lCp3DQDnM-4R0IOfN1T0cw0Egh5ZHg";
+        
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {

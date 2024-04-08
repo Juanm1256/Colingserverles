@@ -23,13 +23,13 @@ namespace Coling.Repositorio.Implementacion
         {
             this.configuration = configuration;
         }
-        public async Task<TokenData> ConstruirToken(string usuarioname, string password, string rol)
+        public async Task<TokenData> ConstruirToken(string usuarioname, string password, string rol, string estado)
         {
             var claims = new List<Claim>()
             {
                 new Claim("usuario", usuarioname),
                 new Claim("rol", rol),
-                new Claim("estado", "Activo")
+                new Claim("estado", estado)
             };
 
             var SecretKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration["LlaveSecreta"] ?? ""));
@@ -85,7 +85,8 @@ namespace Coling.Repositorio.Implementacion
             if (Existe.Rows.Count > 0)
             {
                 string rol = Existe.Rows[0]["rol"].ToString();
-                tokenDevolver = await ConstruirToken(usuariox, passwordx, rol);
+                string estado = Existe.Rows[0]["estado"].ToString();
+                tokenDevolver = await ConstruirToken(usuariox, passwordx, rol, estado);
             }
             return tokenDevolver;
         }
