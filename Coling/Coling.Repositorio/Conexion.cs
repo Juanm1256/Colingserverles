@@ -61,19 +61,43 @@ namespace DAL
             return dt;
         }
 
-        public static string EjecutarEscalarComoString(string consulta)
+        public static bool Insertardatas(string consulta, int id, string user, string pass, string rol, string estado)
         {
+            bool sw = false;
             using (SqlConnection conectar = new SqlConnection(conexion.CONECTAR))
             {
                 conectar.Open();
-                using (SqlCommand cmd = new SqlCommand(consulta, conectar))
+                using (SqlCommand command = new SqlCommand(consulta, conectar))
                 {
-                    cmd.CommandTimeout = 5000;
-                    object result = cmd.ExecuteScalar();
-                    return result != null ? result.ToString() : null;
+                    // Agrega parámetros a la consulta
+                    command.Parameters.AddWithValue("@Idusuario", id);
+                    command.Parameters.AddWithValue("@usuario", user);
+                    command.Parameters.AddWithValue("@password", pass);
+                    command.Parameters.AddWithValue("@rol", rol);
+                    command.Parameters.AddWithValue("@estado", estado);
+
+                    // Ejecuta la consulta y obtén el número de filas afectadas
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        sw = true;
+                    }
                 }
             }
+            return sw;
         }
 
+        public static DataTable Insertar(string consulta, string tabla)
+        {
+            string p = conexion.CONECTAR;
+            SqlConnection conectar = new SqlConnection(conexion.CONECTAR);
+            SqlCommand cmd = new SqlCommand(consulta, conectar);
+            cmd.CommandTimeout = 5000;
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = cmd;
+            DataTable dt = new DataTable(tabla);
+            da.Fill(dt);
+            return dt;
+        }
     }
 }

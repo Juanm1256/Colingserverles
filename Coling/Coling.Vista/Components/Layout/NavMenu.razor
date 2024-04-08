@@ -12,119 +12,248 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        @if (Settings.detalleuser !=null)
+        @if (Settings.detalleuser != null)
         {
-            @if (Settings.detalleuser.rol.Equals("Admin"))
+            @if (Settings.detalleuser.rol == "Admin")
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToquePersona">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Persona
+        </NavLink>
+    </div>
+    @if (perbo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/personas">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Registrar Persona
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/telefonos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Telefono
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/direcciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Direccion
+            </NavLink>
+        </div>
+        
+    }
+    
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToqueTipoSocial">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Tipo Social
+        </NavLink>
+    </div>
+    @if (TipoPbo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/tiposocial">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Registrar Tipo Social
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/personatiposocial">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Persona Tipo Social
+            </NavLink>
+        </div>
+    }
+    
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToqueAfiliado">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+        </NavLink>
+    </div>
+    @if (Afibo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/afiliados">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Afiliados
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/gradoacademico">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Grado Academico
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/profesion">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/profesionafiliado">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion Afiliado
+            </NavLink>
+        </div>
+    }
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToqueEstudio">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+        </NavLink>
+    </div>
+    @if (Estubo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/instituciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Instituciones
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/tipoestudio">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tipo Estudio
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/estudios">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Estudios
+            </NavLink>
+        </div>
+    }
+}
+
+@if (Settings.detalleuser.rol == "Secretaria")
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToqueAfiliado">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+        </NavLink>
+    </div>
+    @if (Afibo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/afiliados">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Afiliados
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/gradoacademico">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Grado Academico
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/profesion">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/profesionafiliado">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion Afiliado
+            </NavLink>
+        </div>
+    }
+    
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="ToqueEstudio">
+    
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+        </NavLink>
+    </div>
+    @if (Estubo == true)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/instituciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Instituciones
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/tipoestudio">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tipo Estudio
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/estudios">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Estudios
+            </NavLink>
+        </div>
+    }
+}
+
+            @if (Settings.detalleuser.rol == "Afiliado")
             {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/personas">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Personas
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/afiliados">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Afiliados
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/direcciones">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Direccion
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/personatiposocial">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Persona Tipo Social
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/profesionafiliado">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion Afiliado
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/telefonos">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Telefono
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/tiposocial">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tipo Social
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/ofertalaboral">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/solicitudes">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Postulaciones
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/solicitudes">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Postulaciones
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="#" @onclick="SignOut">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cerrar Cession
-                    </NavLink>
-                </div>
 
             }
-            @if (Settings.detalleuser.rol == "Secretaria")
-            {
-                
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" @onclick="TogglePublicationType">
-                        
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                    </NavLink>
-                </div>
-                @if (tok==true)
-                {
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="counter">
-                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                        </NavLink>
-                    </div>
-                }
-            }
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="#" @onclick="SignOut">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cerrar Cession
-                </NavLink>
-            </div>
+            @if (Settings.detalleuser.rol == "Institucion")
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="/ofertalaboral">
+            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
+        </NavLink>
+    </div>
+}
+
         }
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" @onclick="SignOut">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cerrar Cession
+            </NavLink>
+        </div>
     </nav>
 </div>
 
 @code{
+    bool perbo = false;
+    bool TipoPbo = false;
+    bool Afibo = false;
+    bool Estubo = false;
 
-    bool tok = false;
-
-    private void TogglePublicationType()
+    private void SignOut()
     {
-        if (tok)
-        {
-            tok = false;
-        }else
-        {
-            tok = true;
-        }
-    }
-
-    private void SignOut() {
         SecureStorage.RemoveAll();
         Settings.detalleuser = null;
 
         nav.NavigateTo("/login");
+    }
+
+    private void ToquePersona()
+    {
+        if (perbo)
+        {
+            perbo = false;
+        }else
+        {
+            perbo = true;
+        }
+    }
+
+    private void ToqueTipoSocial()
+    {
+        if (TipoPbo)
+        {
+            TipoPbo = false;
+        }
+        else
+        {
+            TipoPbo = true;
+        }
+    }
+    private void ToqueAfiliado()
+    {
+        if (Afibo)
+        {
+            Afibo = false;
+        }
+        else
+        {
+            Afibo = true;
+        }
+    }
+    private void ToqueEstudio()
+    {
+        if (Estubo)
+        {
+            Estubo = false;
+        }
+        else
+        {
+            Estubo = true;
+        }
     }
 }
