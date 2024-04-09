@@ -1,4 +1,6 @@
 ﻿using Coling.Shared;
+using Coling.Shared.DTOs;
+using Coling.Vista.Modelos;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,8 +12,9 @@ namespace Coling.Vista.Servicios.Afiliados
 {
     public class PersonaService : IPersonaService
     {
-        string url = "http://localhost:7102/";
-        string endPoint = "";
+        private string url = "http://localhost:7102/";
+        private string baseurl = "http://localhost:7276/";
+        private string endPoint = "";
         private readonly HttpClient clients;
 
         public PersonaService(HttpClient clients)
@@ -117,6 +120,31 @@ namespace Coling.Vista.Servicios.Afiliados
                 result = JsonConvert.DeserializeObject<Persona>(respuestaCuerpo);
             }
             return result;
+        }
+
+        public async Task<bool> InsertarAll(PerTelDir registroperteldir, string token)
+        {
+            bool sw = false;
+            endPoint = url + "api/InsertarAllPersona";
+            string jsonBody = JsonConvert.SerializeObject(registroperteldir);
+            clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            var respuesta = await clients.PostAsync(endPoint, content);
+            if (respuesta != null)
+            {
+                using (var client = new HttpClient())
+                {
+                    var url = $"{baseurl}{APIs.insertaruser}";
+
+                    var serializedStr = JsonConvert.SerializeObject(registroperteldir.registrarUsuario);
+                    var response = await client.PostAsync(url, new StringContent(serializedStr, Encoding.UTF8, "application/json"));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        sw = true;
+                    }
+                }
+            }
+            return sw;
         }
     }
 }

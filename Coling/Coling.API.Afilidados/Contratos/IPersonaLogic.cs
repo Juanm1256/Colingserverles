@@ -1,4 +1,6 @@
-﻿using Coling.Shared;
+﻿using Coling.API.Afilidados.DTOs;
+using Coling.Shared;
+using Coling.Shared.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,7 @@ namespace Coling.API.Afilidados.Contratos
     public interface IPersonaLogic
     {
         public Task<bool> InsertarPersona(Persona persona);
+        public Task<int> InsertarAllPersona(PerTelDir all);
         public Task<bool> ModificarPersona(Persona persona, int id);
         public Task<bool> Eliminarersona(int id);
         public Task<List<Persona>> ListarPersonaTodos();

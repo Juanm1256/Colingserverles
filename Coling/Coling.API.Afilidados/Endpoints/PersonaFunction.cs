@@ -1,5 +1,7 @@
 using Coling.API.Afilidados.Contratos;
+using Coling.API.Afilidados.DTOs;
 using Coling.Shared;
+using Coling.Shared.DTOs;
 using Coling.Utilitarios.Attributes;
 using Coling.Utilitarios.Roles;
 using Microsoft.AspNetCore.Http;
@@ -107,6 +109,34 @@ namespace Coling.API.Afilidados.Endpoints
                 if (seGuardo)
                 {
                     var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    return respuesta;
+                }
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
+        [Function("InsertarAllPersona")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("insertarAllPersonas", "Persona", Description = "Crear Personas, Telefono, Direccion")]
+        [OpenApiRequestBody("application/json", bodyType: typeof(PerTelDir))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PerTelDir))]
+        public async Task<HttpResponseData> InsertarAllPersona([HttpTrigger(AuthorizationLevel.Function, "post", Route = "InsertarAllPersona")] HttpRequestData req)
+        {
+            try
+            {
+                var per = await req.ReadFromJsonAsync<PerTelDir>() ?? throw new Exception("Debe ingresar una persona con todos sus datos");
+                int seGuardo = await personaLogic.InsertarAllPersona(per);
+                if (seGuardo>0)
+                {
+                    var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    respuesta.WriteAsJsonAsync(seGuardo);
                     return respuesta;
                 }
                 return req.CreateResponse(HttpStatusCode.BadRequest);

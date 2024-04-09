@@ -1,5 +1,7 @@
 ﻿using Coling.API.Afilidados.Contratos;
+using Coling.API.Afilidados.DTOs;
 using Coling.Shared;
+using Coling.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,26 @@ namespace Coling.API.Afilidados.Implementaciones
                 sw = true;
             }
             return sw;
+        }
+
+        public async Task<int> InsertarAllPersona(PerTelDir all)
+        {
+            contexto.Personas.Add(all.personas);
+            await contexto.SaveChangesAsync();
+            int idpersona = all.personas.Id;
+            all.telefonos.Idpersona = idpersona;
+            all.direccions.Idpersona = idpersona;
+            contexto.Telefonos.Add(all.telefonos);
+            contexto.Direccions.Add(all.direccions);
+            int response = await contexto.SaveChangesAsync();
+            if (response > 0)
+            {
+                return idpersona;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public async Task<bool> InsertarPersona(Persona persona)

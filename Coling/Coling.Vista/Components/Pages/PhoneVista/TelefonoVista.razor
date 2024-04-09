@@ -30,13 +30,11 @@
                                 <ValidationMessage For="@(()=>telefono.nrotelefono)"></ValidationMessage>
                             </div>
                         </div>
-
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
-                        </div>
                     </EditForm>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -9,5 +9,6 @@ namespace Coling.Vista.Modelos
     internal class APIs
     {
         public const string Authenticateuser = "api/Login";
+        public const string insertaruser = "api/Insertar";
     }
 }

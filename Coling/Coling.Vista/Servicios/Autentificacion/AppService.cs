@@ -11,6 +11,7 @@ namespace Coling.Vista.Servicios.Autentificacion
     public class AppService : IAppService
     {
         private string baseurl = "http://localhost:7276/";
+
         public async Task<string> AuthenticateUser(LoginModel loginModel)
         {
             string returnStr = string.Empty;
