@@ -93,6 +93,28 @@ namespace Coling.API.Afilidados.Endpoints
 
         }
 
+        [Function("ListarAfiliadoEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarAfiliadoactivo", "Afiliado", Description = "Listar Afiliado activas")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Afiliado>))]
+        public async Task<HttpResponseData> ListarPersonasEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarAfiliadoEstadoActivo")] HttpRequestData req)
+        {
+            try
+            {
+                var listapersonas = afiliadoLogic.ListarAfiliadoEstadoActivo();
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listapersonas.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
         [Function("InsertarAfiliado")]
         [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("insertarAfiliado", "Afiliado")]

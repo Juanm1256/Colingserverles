@@ -14,15 +14,28 @@
                     <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                    <EditForm EditContext="contextoEdicionPersona" OnValidSubmit="GuardarCambios">
                         <DataAnnotationsValidator />
                         <div class="mb-3">
                             <label>Nombre Persona:</label>
                             <div>
-                                <InputNumber class="form-control" @bind-Value="@telefono.Idpersona"></InputNumber>
-                                <ValidationMessage For="@(()=>telefono.Idpersona)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="FilterPersons" placeholder="Buscar persona...">
+                                <select class="form-control" @bind="@persona.Id">
+                                    @if (filteredPersons.Any())
+                                    {
+                                        <option value="0">Selecciona Persona</option>
+                                        foreach (var per in filteredPersons)
+                                        {
+                                            <option value="@per.Id">@($"{per.Nombre} {per.Apellidos}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>persona.Id)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
                             <label>Nro Telefono:</label>
                             <div>
@@ -30,11 +43,12 @@
                                 <ValidationMessage For="@(()=>telefono.nrotelefono)"></ValidationMessage>
                             </div>
                         </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                        </div>
                     </EditForm>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -67,6 +81,7 @@
             @foreach (var item in TelefonoListaPaginada)
             {
                 <tr>
+                    <td>@(item.IdPersonanav.Nombre + " " + item.IdPersonanav.Apellidos)</td>
                     <td>@item.Idpersona</td>
                     <td>@item.nrotelefono</td>
                     <td>@item.Estado</td>
@@ -100,12 +115,16 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionPersona;
     private string modalTitle = "Crear Telefono";
     private string modalButtonLabel = "Crear";
     private Telefono telefono = new Telefono();
+    private Persona persona = new Persona();
     private bool mostrarModal = false;
     private string filtroNombre;
     private List<Telefono> TelefonoListaPaginada { get; set; } = new List<Telefono>();
+    private List<Persona> allPersons = new List<Persona>();
+    private List<Persona> filteredPersons = new List<Persona>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token = "";
@@ -130,7 +149,9 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(telefono);
+                contextoEdicionPersona = new EditContext(persona);
                 await CargarTelefono();
+                await CargarPersonas();
             }
         }
         else
@@ -141,7 +162,7 @@
 
     async Task CargarTelefono()
     {
-        
+
         TelefonoLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -175,10 +196,10 @@
     private bool EsPaginaInicial => paginaActual == 1;
     private bool EsPaginaFinal => paginaActual == TotalPaginas;
     private int TotalPaginas => (int)Math.Ceiling((double)TelefonoLista.Count / pageSize);
+
+
     private async Task GuardarCambios()
     {
-        
-
         if (telefono.Id > 0)
         {
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
@@ -209,6 +230,7 @@
         }
         else
         {
+            telefono.Idpersona = persona.Id;
             telefono.Estado = "Activo";
             var respuesta = await servicio.Insertar(telefono, token);
             if (!respuesta)
@@ -237,7 +259,7 @@
 
     private async Task EliminarTelefono(int RK)
     {
-        
+
         telefono = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -277,7 +299,9 @@
     private void AbrirModalCrear()
     {
         telefono = new Telefono();
+        persona = new Persona();
         contextoEdicion = new EditContext(telefono);
+        contextoEdicionPersona = new EditContext(persona);
         modalTitle = "Crear Telefono";
         modalButtonLabel = "Crear";
         mostrarModal = true;
@@ -285,7 +309,7 @@
 
     private async Task AbrirModalModificar(int id)
     {
-        
+
         telefono = await servicio.ObtenerPorId(id, token);
         contextoEdicion = new EditContext(telefono);
         modalTitle = "Modificar Telefono";
@@ -295,7 +319,7 @@
 
     private async Task cambiarestado(int id, string estado)
     {
-        
+
         if (estado == "Activo")
         {
             telefono = await servicio.ObtenerPorId(id, token);
@@ -367,7 +391,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        
+
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {
@@ -379,10 +403,25 @@
             await CargarTelefono();
             await ActualizarListaPaginada();
         }
-
     }
+
+    void FilterPersons(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredPersons = allPersons
+            .Where(p => (p.Nombre + " " + p.Apellidos).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    async Task CargarPersonas()
+    {
+        allPersons = await servicio.ListarPersona(token);
+        filteredPersons = allPersons.ToList();
+    }
+
     private void CerrarModal()
     {
+        filtroNombre = "";
         mostrarModal = false;
     }
 }

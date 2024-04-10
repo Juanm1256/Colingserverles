@@ -51,9 +51,8 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<PersonaTipoSocial>> ListarPersonaTipoSocialEstado()
         {
-            var listar = await contexto.PersonaTipoSocials.ToListAsync();
-            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
-            return respuesta.ToList();
+            var listarstatus = await contexto.PersonaTipoSocials.Include(d=>d.Idtiposocialnav).Include(x=>x.IdPersonanav).Where(x => x.Estado == "Activo" || x.Estado == "Inactivo").ToListAsync();
+            return listarstatus;
         }
 
         public async Task<List<PersonaTipoSocial>> ListarPersonaTipoSocialPorNombre(string nombre)

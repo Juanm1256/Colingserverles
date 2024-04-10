@@ -14,15 +14,29 @@
                     <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+
+                    <EditForm EditContext="contextoEdicionAfiliado" OnValidSubmit="GuardarCambios">
                         <DataAnnotationsValidator />
                         <div class="mb-3">
-                            <label>Afiliado:</label>
+                            <label>Nombre Afiliado:</label>
                             <div>
-                                <InputNumber class="form-control" @bind-Value="@profesionAfiliado.Idafiliado"></InputNumber>
-                                <ValidationMessage For="@(()=>profesionAfiliado.Idafiliado)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="FilterAfiliado" placeholder="Buscar afiliado...">
+                                <select class="form-control" @bind="@afiliado.Id">
+                                    @if (filteredAfiliado.Any())
+                                    {
+                                        <option value="0">Selecciona Afiliado</option>
+                                        foreach (var per in filteredAfiliado)
+                                        {
+                                            <option value="@per.Id">@($"{per.IdPersonanav.Nombre} {per.IdPersonanav.Apellidos}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>afiliado.Id)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
                             <label>Profesion:</label>
                             <div>
@@ -65,7 +79,7 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre" />
 </div>
 
 <div>
@@ -84,7 +98,7 @@
             @foreach (var item in ProfesionAfiliadoListaPaginada)
             {
                 <tr>
-                    <td>@item.Idafiliado</td>
+                    <td>@(item.IdAfiliadonav.IdPersonanav.Nombre + " " + item.IdAfiliadonav.IdPersonanav.Apellidos)</td>
                     <td>@item.Idprofesion</td>
                     <td>@item.fechaasignacion</td>
                     <td>@item.Nrosellosib</td>
@@ -119,12 +133,16 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionAfiliado;
     private string modalTitle = "Crear ProfesionAfiliado";
     private string modalButtonLabel = "Crear";
     private ProfesionAfiliado profesionAfiliado = new ProfesionAfiliado();
+    private Afiliado afiliado = new Afiliado();
     private bool mostrarModal = false;
     private string filtroNombre;
     private List<ProfesionAfiliado> ProfesionAfiliadoListaPaginada { get; set; } = new List<ProfesionAfiliado>();
+    private List<Afiliado> allAfiliado = new List<Afiliado>();
+    private List<Afiliado> filteredAfiliado = new List<Afiliado>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token = "";
@@ -149,7 +167,9 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(profesionAfiliado);
+                contextoEdicionAfiliado = new EditContext(afiliado);
                 await CargarProfesionAfiliado();
+                await CargarAfiliado();
             }
         }
         else
@@ -160,9 +180,10 @@
 
     async Task CargarProfesionAfiliado()
     {
-        
+
         ProfesionAfiliadoLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
+        await CargarAfiliado();
     }
 
     private async Task ActualizarListaPaginada()
@@ -196,14 +217,14 @@
     private int TotalPaginas => (int)Math.Ceiling((double)ProfesionAfiliadoLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        
+
 
         if (profesionAfiliado.Id > 0)
         {
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas modificar este registro de ProfesionAfiliado?",
+                    Text = "¿Deseas modificar este registro de Profesion Afiliado?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Modificar",
@@ -229,6 +250,7 @@
         else
         {
             profesionAfiliado.Estado = "Activo";
+            profesionAfiliado.Idafiliado = afiliado.Id;
             var respuesta = await servicio.Insertar(profesionAfiliado, token);
             if (!respuesta)
             {
@@ -261,7 +283,7 @@
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Estás seguro?",
-                Text = "¿Deseas borrar este registro de ProfesionAfiliado?",
+                Text = "¿Deseas borrar este registro de Profesion Afiliado?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Sí, borrarlo",
@@ -296,8 +318,10 @@
     private void AbrirModalCrear()
     {
         profesionAfiliado = new ProfesionAfiliado();
+        afiliado = new Afiliado();
         contextoEdicion = new EditContext(profesionAfiliado);
-        modalTitle = "Crear ProfesionAfiliado";
+        contextoEdicionAfiliado = new EditContext(afiliado);
+        modalTitle = "Crear Profesion Afiliado";
         modalButtonLabel = "Crear";
         mostrarModal = true;
     }
@@ -307,7 +331,7 @@
         
         profesionAfiliado = await servicio.ObtenerPorId(id, token);
         contextoEdicion = new EditContext(profesionAfiliado);
-        modalTitle = "Modificar ProfesionAfiliado";
+        modalTitle = "Modificar Profesion Afiliado";
         modalButtonLabel = "Guardar Cambios";
         mostrarModal = true;
     }
@@ -322,7 +346,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas desactivar este registro de ProfesionAfiliado?",
+                    Text = "¿Deseas desactivar este registro de Profesion Afiliado?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Desactivar",
@@ -353,7 +377,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas Activar este registro de ProfesionAfiliado?",
+                    Text = "¿Deseas Activar este registro de Profesion Afiliado?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Activar",
@@ -400,6 +424,21 @@
         }
 
     }
+
+    void FilterAfiliado(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredAfiliado = allAfiliado
+            .Where(p => (p.IdPersonanav.Nombre + " " + p.IdPersonanav.Apellidos).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    async Task CargarAfiliado()
+    {
+        allAfiliado = await servicio.ListarAfiliado(token);
+        filteredAfiliado = allAfiliado.ToList();
+    }
+
     private void CerrarModal()
     {
         mostrarModal = false;

@@ -120,6 +120,16 @@
                         </NavLink>
                     </div>
                 }
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/ofertalaboral">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/solicitudes">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Solicitudes
+                    </NavLink>
+                </div>
             }
 
             @if (Settings.detalleuser.rol == "Secretaria")
@@ -157,7 +167,7 @@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" @onclick="ToqueEstudio">
 
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Estudios
                     </NavLink>
                 </div>
                 @if (Estubo == true)

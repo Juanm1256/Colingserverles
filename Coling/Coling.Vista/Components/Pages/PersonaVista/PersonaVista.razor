@@ -7,7 +7,7 @@
 @if (mostrarModal == "Crear")
 {
     <div class="modal fade show" style="display: block;" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
@@ -41,13 +41,21 @@
                         <div class="mb-3">
                             <label>Foto:</label>
                             <div>
-                                <InputText class="form-control" @bind-Value="@persona.Foto"></InputText>
+                                <InputFile id="foto" OnChange="HandleFileSelected" />
                                 <ValidationMessage For="@(()=>persona.Foto)"></ValidationMessage>
                             </div>
                         </div>
 
                     </EditForm>
-                   
+                    <EditForm EditContext="contextoEdiciontel" OnValidSubmit="GuardarCambios">
+                        <div class="mb-3">
+                            <label>Telefono:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@telefono.nrotelefono"></InputText>
+                                <ValidationMessage For="@(()=>telefono.nrotelefono)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </EditForm>
                     <EditForm EditContext="contextoEdiciondir" OnValidSubmit="GuardarCambios">
                         <div class="mb-3">
                             <label>Descripción Dirección:</label>
@@ -72,10 +80,14 @@
                                 <ValidationMessage For="@(()=>regisuser.Password)"></ValidationMessage>
                             </div>
                         </div>
-                        <div>
+                        <div class="mb-3">
                             <label>Rol:</label>
                             <div>
-                                <InputText class="form-control" @bind-Value="@regisuser.Rol"></InputText>
+                                <select class="form-control" @bind="regisuser.Rol">
+                                    <option value="Afiliado">Afiliado</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Secretaria">Secretaria</option>
+                                </select>
                                 <ValidationMessage For="@(()=>regisuser.Rol)"></ValidationMessage>
                             </div>
                         </div>
@@ -127,15 +139,15 @@ else
                             <div class="mb-3">
                                 <label>Foto:</label>
                                 <div>
-                                    <InputText class="form-control" @bind-Value="@persona.Foto"></InputText>
+                                    <InputFile id="foto" OnChange="HandleFileSelected" />
                                     <ValidationMessage For="@(()=>persona.Foto)"></ValidationMessage>
                                 </div>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                            </div>
                         </EditForm>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -257,9 +269,8 @@ else
 
     }
 
-    async Task CargarPersona()
+    private async Task CargarPersona()
     {
-
         PersonaLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -293,6 +304,26 @@ else
     private bool EsPaginaInicial => paginaActual == 1;
     private bool EsPaginaFinal => paginaActual == TotalPaginas;
     private int TotalPaginas => (int)Math.Ceiling((double)PersonaLista.Count / pageSize);
+
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+
+        if (archivo != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await archivo.OpenReadStream().CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+                var base64String = Convert.ToBase64String(bytes);
+
+                // Almacena la imagen en persona.Foto
+                persona.Foto = base64String;
+            }
+        }
+    }
+
 
     /*REGISTRAR Y MODIFICAR */
     private async Task GuardarCambios()

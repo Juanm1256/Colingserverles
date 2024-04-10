@@ -1,5 +1,7 @@
 ﻿using Coling.API.Afilidados.Contratos;
+using Coling.API.Afilidados.DTOs;
 using Coling.Shared;
+using Coling.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -51,9 +53,11 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<Direccion>> ListarDireccionEstado()
         {
-            var listar = await contexto.Direccions.ToListAsync();
-            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
-            return respuesta.ToList();
+            var respuesta = await contexto.Direccions
+                .Include(d => d.IdPersonanav) // Incluir la entidad Persona
+                .Where(x => x.Estado == "Activo" || x.Estado == "Inactivo")
+                .ToListAsync();
+            return respuesta;
         }
 
         public async Task<List<Direccion>> ListarDireccionPorNombre(string nombre)

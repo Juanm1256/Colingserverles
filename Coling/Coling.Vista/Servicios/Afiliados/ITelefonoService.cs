@@ -11,6 +11,7 @@ namespace Coling.Vista.Servicios.Afiliados
     {
         Task<List<Telefono>> ListarTelefono(string token);
         Task<List<Telefono>> ListarEstado(string token);
+        Task<List<Persona>> ListarPersona(string token);
         Task<List<Telefono>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(Telefono telefono, string token);
         Task<bool> Modificar(Telefono telefono, int id, string token);

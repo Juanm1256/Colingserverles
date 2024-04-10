@@ -118,5 +118,19 @@ namespace Coling.Vista.Servicios.Afiliados
             }
             return result;
         }
+
+        public async Task<List<Afiliado>> ListarAfiliado(string token)
+        {
+            endPoint = "api/ListarAfiliadoEstadoActivo";
+            clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await clients.GetAsync(endPoint);
+            List<Afiliado> result = new List<Afiliado>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Afiliado>>(respuestaCuerpo);
+            }
+            return result;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Coling.API.Afilidados.DTOs;
 using Coling.Shared;
 using Coling.Shared.DTOs;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,35 +23,67 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<bool> Eliminarersona(int id)
         {
-            bool sw = false;
-            Persona persona = await contexto.Personas.FirstOrDefaultAsync(x=> x.Id==id);
-            contexto.Personas.Remove(persona);
-            await contexto.SaveChangesAsync();
-            if (persona != null)
+            try
             {
-                sw = true;
+                bool sw = false;
+                Persona persona = await contexto.Personas.FirstOrDefaultAsync(x => x.Id == id);
+                contexto.Personas.Remove(persona);
+                await contexto.SaveChangesAsync();
+                if (persona != null)
+                {
+                    sw = true;
+                }
+                return sw;
             }
-            return sw;
+            catch (Exception)
+            {
+
+                return false;
+            }
+            
         }
 
         public async Task<int> InsertarAllPersona(PerTelDir all)
         {
-            contexto.Personas.Add(all.personas);
-            await contexto.SaveChangesAsync();
-            int idpersona = all.personas.Id;
-            all.telefonos.Idpersona = idpersona;
-            all.direccions.Idpersona = idpersona;
-            contexto.Telefonos.Add(all.telefonos);
-            contexto.Direccions.Add(all.direccions);
-            int response = await contexto.SaveChangesAsync();
-            if (response > 0)
+            try
             {
-                return idpersona;
+                int id = 0;
+                int response = 0;
+                if (!all.personas.IsNullOrDefault())
+                {
+                    contexto.Personas.Add(all.personas);
+                    response = await contexto.SaveChangesAsync();
+                    id = all.personas.Id;
+                }
+                
+                if (!all.telefonos.IsNullOrDefault())
+                {
+                    
+                    all.telefonos.Idpersona = id;
+                    contexto.Telefonos.Add(all.telefonos);
+                    response = await contexto.SaveChangesAsync();
+                }
+                if (!all.direccions.IsNullOrDefault())
+                {
+                    all.direccions.Idpersona = id;
+                    contexto.Direccions.Add(all.direccions);
+                    response = await contexto.SaveChangesAsync();
+                }
+                if (response>0)
+                {
+                    return id;
+                }
+                else
+                {
+                    return 0;
+                }
             }
-            else
+            catch (Exception)
             {
-                return 0;
+
+                throw;
             }
+            
         }
 
         public async Task<bool> InsertarPersona(Persona persona)
@@ -69,6 +102,13 @@ namespace Coling.API.Afilidados.Implementaciones
         {
             var listar = await contexto.Personas.ToListAsync();
             var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
+            return respuesta.ToList();
+        }
+        
+        public async Task<List<Persona>> ListarPersonaEstadoActivo()
+        {
+            var listar = await contexto.Personas.ToListAsync();
+            var respuesta = listar.Where(x => x.Estado == "Activo");
             return respuesta.ToList();
         }
 

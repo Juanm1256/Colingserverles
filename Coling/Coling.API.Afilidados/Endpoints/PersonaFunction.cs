@@ -49,7 +49,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
         [Function("ListarPersonasEstado")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("listarPersonas", "Persona", Description = "Listar Personas")]
+        [OpenApiOperation("listarPersonasestado", "Persona", Description = "Listar Personas")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Persona>))]
         public async Task<HttpResponseData> ListarPersonasEstado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPersonasEstado")] HttpRequestData req)
         {
@@ -69,9 +69,32 @@ namespace Coling.API.Afilidados.Endpoints
             }
 
         }
+
+        [Function("ListarPersonasEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarPersonasactivo", "Persona", Description = "Listar Personas activas")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Persona>))]
+        public async Task<HttpResponseData> ListarPersonasEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPersonasEstadoActivo")] HttpRequestData req)
+        {
+            try
+            {
+                var listapersonas = personaLogic.ListarPersonaEstadoActivo();
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listapersonas.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
         [Function("ListarPersonasPorNombre")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("listarPersonas", "Persona", Description = "Listar Personas")]
+        [OpenApiOperation("listarPersonaspornombre", "Persona", Description = "Listar Personas")]
         [OpenApiParameter("nombre", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Persona>))]
         public async Task<HttpResponseData> ListarPersonasPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPersonasPorNombre/{nombre}")] HttpRequestData req, string nombre)
@@ -136,7 +159,7 @@ namespace Coling.API.Afilidados.Endpoints
                 if (seGuardo>0)
                 {
                     var respuesta = req.CreateResponse(HttpStatusCode.OK);
-                    respuesta.WriteAsJsonAsync(seGuardo);
+                    respuesta.WriteAsJsonAsync(new { Idinsertado = seGuardo });
                     return respuesta;
                 }
                 return req.CreateResponse(HttpStatusCode.BadRequest);

@@ -93,6 +93,28 @@ namespace Coling.API.Afilidados.Endpoints
 
         }
 
+        [Function("ListarTipoSocialEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("listarTipoSocialactivo", "TipoSocial", Description = "Listar Tipo Social activas")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<TipoSocial>))]
+        public async Task<HttpResponseData> ListarPersonasEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarTipoSocialEstadoActivo")] HttpRequestData req)
+        {
+            try
+            {
+                var listapersonas = tipoSocial.ListarTipoSocialEstadoActivo();
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listapersonas.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
         [Function("InsertarTipoSocial")]
         [ColingAuthorize(AplicacionRoles.Admin)]
         [OpenApiOperation("insertarTipoSocial", "TipoSocial")]

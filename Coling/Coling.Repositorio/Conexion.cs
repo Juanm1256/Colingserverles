@@ -61,7 +61,7 @@ namespace DAL
             return dt;
         }
 
-        public static bool Insertardatas(string consulta, int id, string user, string pass, string rol, string estado)
+        public static bool Insertardatas(string consulta, string id, string user, string pass, string rol, string estado)
         {
             bool sw = false;
             using (SqlConnection conectar = new SqlConnection(conexion.CONECTAR))

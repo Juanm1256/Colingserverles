@@ -14,6 +14,7 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> EliminarAfiliado(int id);
         public Task<List<Afiliado>> ListarAfiliadosTodos();
         public Task<List<Afiliado>> ListarAfiliadoEstado();
+        public Task<List<Afiliado>> ListarAfiliadoEstadoActivo();
         public Task<List<Afiliado>> ListarAfiliadoPorNombre(string nombre);
         public Task<Afiliado> ObtenerAfiliadoById(int id);
     }

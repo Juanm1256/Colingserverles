@@ -17,6 +17,7 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> Eliminarersona(int id);
         public Task<List<Persona>> ListarPersonaTodos();
         public Task<List<Persona>> ListarPersonaEstado();
+        public Task<List<Persona>> ListarPersonaEstadoActivo();
         public Task<List<Persona>> ListarPersonaPorNombre(string nombre);
         public Task<Persona> ObtenerPersonaById(int id);
 

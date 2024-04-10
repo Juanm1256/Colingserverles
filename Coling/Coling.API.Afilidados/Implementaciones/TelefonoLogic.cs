@@ -50,9 +50,9 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<Telefono>> ListarTelefonoEstado()
         {
-            var listar = await contexto.Telefonos.ToListAsync();
-            var respuesta = listar.Where(x => x.Estado == "Activo" || x.Estado == "Inactivo");
-            return respuesta.ToList();
+            var listarestado = await contexto.Telefonos.Include(x => x.IdPersonanav)
+                .Where(x => x.Estado == "Activo" || x.Estado == "Inactivo").ToListAsync();
+            return listarestado;
         }
 
         public async Task<List<Telefono>> ListarTelefonoPorNombre(string nombre)

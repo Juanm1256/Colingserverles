@@ -56,7 +56,7 @@ namespace Coling.Repositorio.Implementacion
             return Encriptado;
         }
 
-        public async Task<bool> Insertar(int Idusuario, string usuariox, string passwordx, string rol, string estado)
+        public async Task<bool> Insertar(string Idusuario, string usuariox, string passwordx, string rol, string estado)
         {
             string passEncriptado = await EncriptarPassword(passwordx);
             string consulta = "INSERT INTO Usuario (idusuario, nombreuser, password, rol, estado) VALUES (@Idusuario ,@usuario, @password, @rol, @estado)";
