@@ -78,7 +78,7 @@ namespace Coling.API.Curriculum.Endpoints
 
         [Function("ListarGradoAEstado")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiOperation("Listarestadospec", "GradoAcademico")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
         public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
@@ -100,7 +100,7 @@ namespace Coling.API.Curriculum.Endpoints
 
         [Function("ListarPorNombreGradoA")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiOperation("Listarestadospec", "GradoAcademico")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
         public async Task<HttpResponseData> ListarPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPorNombreGradoA/{nombre}")] HttpRequestData req, string nombre)
@@ -110,6 +110,28 @@ namespace Coling.API.Curriculum.Endpoints
                 var lista = repos.ListarPorNombre(nombre);
                 var respuest = req.CreateResponse(HttpStatusCode.OK);
                 await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
+        [Function("ListarGradoEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("ListarGradoEstadoActivo", "GradoAcademico")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(GradoAcademico))]
+        public async Task<HttpResponseData> ListarGradoEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = await repos.GetallstatusActivo();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista);
                 return respuest;
 
             }

@@ -14,6 +14,7 @@ namespace Coling.API.Afilidados.Contratos
         public Task<bool> EliminarTipoSocial(int id);
         public Task<List<TipoSocial>> ListarTipoSocialTodos();
         public Task<List<TipoSocial>> ListarTipoSocialEstado();
+        public Task<List<TipoSocial>> ListarTipoSocialEstadoActivo();
         public Task<List<TipoSocial>> ListarTipoSocialPorNombre(string nombre);
         public Task<TipoSocial> ObtenerTipoSocialById(int id);
     }

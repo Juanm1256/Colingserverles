@@ -120,6 +120,16 @@
                         </NavLink>
                     </div>
                 }
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/ofertalaboral">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/solicitudes">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Solicitudes
+                    </NavLink>
+                </div>
             }
 
             @if (Settings.detalleuser.rol == "Secretaria")
@@ -137,41 +147,27 @@
                             <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Afiliados
                         </NavLink>
                     </div>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/gradoacademico">
-                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Grado Academico
-                        </NavLink>
-                    </div>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/profesion">
-                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion
-                        </NavLink>
-                    </div>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/profesionafiliado">
-                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Profesion Afiliado
-                        </NavLink>
-                    </div>
                 }
 
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" @onclick="ToqueEstudio">
 
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Afiliados
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Estudios
                     </NavLink>
                 </div>
                 @if (Estubo == true)
                 {
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/instituciones">
-                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Instituciones
-                        </NavLink>
-                    </div>
-                    <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/tipoestudio">
                             <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tipo Estudio
                         </NavLink>
                     </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/experiencialaboral">
+                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Experiencia Laboral
+                        </NavLink>
+                    </div>
+                    
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/estudios">
                             <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Estudios
@@ -202,8 +198,8 @@
                     </div>
                 }
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/solicitudes">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Postulaciones
+                    <NavLink class="nav-link" href="/ofertalaboral">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Oferta Laboral
                     </NavLink>
                 </div>
             }

@@ -54,10 +54,53 @@ namespace Coling.Autentificacion
         {
             HttpResponseData? respuesta = null;
             var login = await req.ReadFromJsonAsync<Registermodel>() ?? throw new ValidationException("Sus credenciales deben ser completas");
-            var tokenFinal = await usuarioRepositorio.Insertar(login.Idusuario,login.UserName, login.Password, login.Rol, login.Estado);
+            var tokenFinal = await usuarioRepositorio.Insertar(login.Id,login.UserName, login.Password, login.Rol, login.Estado);
             if (tokenFinal != null)
             {
                 respuesta = req.CreateResponse(HttpStatusCode.OK);
+            }
+            else
+            {
+                respuesta = req.CreateResponse(HttpStatusCode.Unauthorized);
+            }
+            return respuesta;
+        }
+
+        [Function("Modificar")]
+        [OpenApiOperation("Modificar", "Accont", Description = " Busca las credenciales")]
+        [OpenApiRequestBody("application/json", typeof(Registermodel), Description = "Introduzca los datos de credenciales model")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ITokenData), Description = "El token es")]
+
+        public async Task<HttpResponseData> Modificar([HttpTrigger(AuthorizationLevel.Anonymous, "put")] HttpRequestData req)
+        {
+            HttpResponseData? respuesta = null;
+            var login = await req.ReadFromJsonAsync<Registermodel>() ?? throw new ValidationException("Sus credenciales deben ser completas");
+            var tokenFinal = await usuarioRepositorio.Modificar(login.Id, login.UserName, login.Password, login.Rol, login.Estado);
+            if (tokenFinal != null)
+            {
+                respuesta = req.CreateResponse(HttpStatusCode.OK);
+            }
+            else
+            {
+                respuesta = req.CreateResponse(HttpStatusCode.Unauthorized);
+            }
+            return respuesta;
+        }
+
+        [Function("ObtenerId")]
+        [OpenApiOperation("ObtenerId", "Accont", Description = " Busca las credenciales")]
+        [OpenApiParameter("id", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiRequestBody("application/json", typeof(Registermodel), Description = "Introduzca los datos de credenciales model")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ITokenData), Description = "El token es")]
+
+        public async Task<HttpResponseData> ObtenerId([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ObtenerId/{id}")] HttpRequestData req, string id)
+        {
+            HttpResponseData? respuesta = null;
+            var tokenFinal = await usuarioRepositorio.Obtenerid(id);
+            if (tokenFinal != null)
+            {
+                respuesta = req.CreateResponse(HttpStatusCode.OK);
+                respuesta.WriteAsJsonAsync(tokenFinal);
             }
             else
             {

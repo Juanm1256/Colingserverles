@@ -1,17 +1,19 @@
-﻿using Coling.Vista.Modelos;
+﻿using Coling.Shared;
+using Coling.Vista.Modelos;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Coling.Vista.Servicios.Curriculum
 {
     public class ProfesionService : IProfesionService
     {
-        string url = "http://localhost:7015/";
-        string endPoint = "";
+        private string url = "http://localhost:7015/";
+        private string endPoint = "";
         private readonly HttpClient client;
 
         public ProfesionService(HttpClient client)
@@ -67,20 +69,53 @@ namespace Coling.Vista.Servicios.Curriculum
 
         public async Task<List<Profesion>> ListarEstado(string token)
         {
-            string endPoint = "api/ListarProfesionEstado";
+            endPoint = "api/ListarProfesionEstado";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await client.GetAsync(endPoint);
-            List<Profesion> result = new List<Profesion>();
-            if (response.IsSuccessStatusCode)
+
+            var responseTask1 = client.GetAsync(endPoint);
+            var responseTask2 = client.GetAsync(APIs.listargradoestadoactivo);
+
+            await Task.WhenAll(responseTask1, responseTask2);
+
+            var response1 = await responseTask1;
+            var response2 = await responseTask2;
+
+            if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
             {
-                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<List<Profesion>>(respuestaCuerpo);
+                using (var stream1 = await response1.Content.ReadAsStreamAsync())
+                using (var stream2 = await response2.Content.ReadAsStreamAsync())
+                using (var reader1 = new StreamReader(stream1))
+                using (var reader2 = new StreamReader(stream2))
+                {
+                    var respuestaCuerpo1 = await reader1.ReadToEndAsync();
+                    var respuestaCuerpo2 = await reader2.ReadToEndAsync();
+
+                    var result = JsonConvert.DeserializeObject<List<Profesion>>(respuestaCuerpo1);
+                    var gradoAcademicos = JsonConvert.DeserializeObject<List<GradoAcademico>>(respuestaCuerpo2);
+
+                    var diccionariograd = gradoAcademicos.ToDictionary(p => p.RowKey, p => p.NombreGrado);
+
+                    foreach (var item in result)
+                    {
+                        if (diccionariograd.TryGetValue(item.Idgrado, out string nombregradoa))
+                        {
+                            item.Idgrado = nombregradoa;
+                        }
+                    }
+
+                    return result;
+                }
             }
-            return result;
+            else
+            {
+                return new List<Profesion>();
+            }
         }
+
+
         public async Task<List<Profesion>> ListarPorNombre(string nombre, string token)
         {
-            string endPoint = $"api/ListarPorNombreProfesion/{nombre}";
+            endPoint = $"api/ListarPorNombreProfesion/{nombre}";
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage response = await client.GetAsync(endPoint);
             List<Profesion> result = new List<Profesion>();
@@ -91,6 +126,52 @@ namespace Coling.Vista.Servicios.Curriculum
             }
             return result;
         }
+
+        public async Task<List<Profesion>> ListarProfesionEstadoActivo(string token)
+        {
+            endPoint = "api/ListarProfesionEstadoActivo";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var responseTask1 = client.GetAsync(endPoint);
+            var responseTask2 = client.GetAsync(APIs.listargradoestadoactivo);
+
+            await Task.WhenAll(responseTask1, responseTask2);
+
+            var response1 = await responseTask1;
+            var response2 = await responseTask2;
+
+            if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
+            {
+                using (var stream1 = await response1.Content.ReadAsStreamAsync())
+                using (var stream2 = await response2.Content.ReadAsStreamAsync())
+                using (var reader1 = new StreamReader(stream1))
+                using (var reader2 = new StreamReader(stream2))
+                {
+                    var respuestaCuerpo1 = await reader1.ReadToEndAsync();
+                    var respuestaCuerpo2 = await reader2.ReadToEndAsync();
+
+                    var result = JsonConvert.DeserializeObject<List<Profesion>>(respuestaCuerpo1);
+                    var gradoAcademicos = JsonConvert.DeserializeObject<List<GradoAcademico>>(respuestaCuerpo2);
+
+                    var diccionariograd = gradoAcademicos.ToDictionary(p => p.RowKey, p => p.NombreGrado);
+
+                    foreach (var item in result)
+                    {
+                        if (diccionariograd.TryGetValue(item.Idgrado, out string nombregradoa))
+                        {
+                            item.Idgrado = nombregradoa;
+                        }
+                    }
+
+                    return result;
+                }
+            }
+            else
+            {
+                return new List<Profesion>();
+            }
+        }
+
         public async Task<bool> Modificar(Profesion profesion, string token)
         {
             bool sw = false;

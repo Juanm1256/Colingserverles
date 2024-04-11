@@ -10,6 +10,7 @@ namespace Coling.Vista.Servicios.Afiliados
     public interface IAfiliadoService
     {
         Task<List<Afiliado>> ListarAfiliado(string token);
+        Task<List<Persona>> ListarPersona(string token);
         Task<List<Afiliado>> ListarEstado(string token);
         Task<List<Afiliado>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(Afiliado afiliado, string token);

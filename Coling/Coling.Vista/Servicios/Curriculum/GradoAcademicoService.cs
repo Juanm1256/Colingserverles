@@ -120,5 +120,19 @@ namespace Coling.Vista.Servicios.Curriculum
             }
             return gradoAcademico;
         }
+
+        public async Task<List<GradoAcademico>> ListarGradoEstadoActivo(string token)
+        {
+            string endPoint = "api/ListarGradoEstadoActivo";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<GradoAcademico> result = new List<GradoAcademico>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<GradoAcademico>>(respuestaCuerpo);
+            }
+            return result;
+        }
     }
 }

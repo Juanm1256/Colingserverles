@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using Coling.Shared;
 
 namespace DAL
 {
@@ -61,7 +62,7 @@ namespace DAL
             return dt;
         }
 
-        public static bool Insertardatas(string consulta, int id, string user, string pass, string rol, string estado)
+        public static bool Insertardatas(string consulta, string id, string user, string pass, string rol, string estado)
         {
             bool sw = false;
             using (SqlConnection conectar = new SqlConnection(conexion.CONECTAR))
@@ -85,6 +86,40 @@ namespace DAL
                 }
             }
             return sw;
+        }
+
+
+
+        public static RegistrarUsuario Obtenerdata(string consulta, string id)
+        {
+            RegistrarUsuario usuario = null;
+            using (SqlConnection conectar = new SqlConnection(conexion.CONECTAR))
+            {
+                conectar.Open();
+                using (SqlCommand command = new SqlCommand(consulta, conectar))
+                {
+                    // Agrega parámetros a la consulta
+                    command.Parameters.AddWithValue("@Idusuario", id);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        // Verifica si hay filas en el resultado
+                        if (reader.Read())
+                        {
+                            // Crea un objeto RegistrarUsuario y establece sus propiedades
+                            usuario = new RegistrarUsuario
+                            {
+                                Id = reader["idusuario"].ToString(),
+                                UserName = reader["nombreuser"].ToString(),
+                                Password = reader["password"].ToString(),
+                                Rol = reader["rol"].ToString(),
+                                Estado = reader["estado"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            return usuario;
         }
 
         public static DataTable Insertar(string consulta, string tabla)

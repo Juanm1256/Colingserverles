@@ -36,10 +36,11 @@ namespace Coling.API.Curriculum.Endpoints
                 var registro = await req.ReadFromJsonAsync<Institucion>() ?? throw new Exception("Debe ingresar una institucion con todos sus datos");
                 registro.RowKey=Guid.NewGuid().ToString();
                 registro.Timestamp=DateTime.UtcNow;
-                bool sw = await repos.Insertar(registro);
-                if (sw)
+                string sw = await repos.Insertar(registro);
+                if (!string.IsNullOrWhiteSpace(sw))
                 {
                     var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    respuesta.WriteAsJsonAsync(new { Idinsertado = sw });
                     return respuesta;
                 }
                 else
@@ -112,6 +113,29 @@ namespace Coling.API.Curriculum.Endpoints
                 var lista = repos.ListarPorNombre(nombre);
                 var respuest = req.CreateResponse(HttpStatusCode.OK);
                 await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
+
+        [Function("ListarInstitucionEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
+        [OpenApiOperation("ListarInstitucionEstadoActivo", "Institucion")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Institucion))]
+        public async Task<HttpResponseData> ListarInstitucionEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = await repos.GetallInstitucionstatus();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista);
                 return respuest;
 
             }

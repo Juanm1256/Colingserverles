@@ -11,6 +11,7 @@ namespace Coling.Vista.Servicios.Curriculum
     {
         Task<List<TipoEstudio>> Listar(string token);
         Task<List<TipoEstudio>> ListarEstado(string token);
+        Task<List<TipoEstudio>> ListarteEstadoActivo(string token);
         Task<List<TipoEstudio>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(TipoEstudio tipoEstudio, string token);
         Task<bool> Modificar(TipoEstudio tipoEstudio, string token);

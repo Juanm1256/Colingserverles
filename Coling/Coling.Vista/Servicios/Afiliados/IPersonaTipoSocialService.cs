@@ -11,6 +11,8 @@ namespace Coling.Vista.Servicios.Afiliados
     {
         Task<List<PersonaTipoSocial>> ListarPersonaTipoSocial(string token);
         Task<List<PersonaTipoSocial>> ListarEstado(string token);
+        Task<List<Persona>> ListarPersona(string token);
+        Task<List<TipoSocial>> ListarTipoSocial(string token);
         Task<List<PersonaTipoSocial>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(PersonaTipoSocial personaTipoSocial, string token);
         Task<bool> Modificar(PersonaTipoSocial personaTipoSocial, int id, string token);

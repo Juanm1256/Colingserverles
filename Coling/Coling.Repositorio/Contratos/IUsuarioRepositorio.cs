@@ -1,4 +1,5 @@
 ﻿using Coling.Repositorio.Implementacion;
+using Coling.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,9 @@ namespace Coling.Repositorio.Contratos
     public interface IUsuarioRepositorio
     {
         public Task<TokenData> VerficarCredenciales(string usuariox, string passwordx);
-        public Task<bool> Insertar(int Idusuario, string usuariox, string passwordx, string rol, string estado);
+        public Task<bool> Insertar(string Idusuario, string usuariox, string passwordx, string rol, string estado);
+        public Task<bool> Modificar(string Idusuario, string usuariox, string passwordx, string rol, string estado);
+        public Task<RegistrarUsuario> Obtenerid(string Idusuario);
         public Task<string> EncriptarPassword(string password);
         public Task<bool> ValidarToken(string token);
         public Task<TokenData> ConstruirToken(string usuarioname, string password, string rol, string estado);

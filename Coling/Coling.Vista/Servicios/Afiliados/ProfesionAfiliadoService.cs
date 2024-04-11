@@ -1,5 +1,7 @@
 ﻿using Coling.Shared;
+using Coling.Vista.Modelos;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +12,9 @@ namespace Coling.Vista.Servicios.Afiliados
 {
     public class ProfesionAfiliadoService : IProfesionAfiliadoService
     {
-        string url = "http://localhost:7102/";
-        string endPoint = "";
+        private string url = "http://localhost:7102/";
+        private string curl = "http://localhost:7015/";
+        private string endPoint = "";
         private readonly HttpClient clients;
 
         public ProfesionAfiliadoService(HttpClient clients)
@@ -52,15 +55,48 @@ namespace Coling.Vista.Servicios.Afiliados
         {
             endPoint = "api/ListarProfesionAfiliadoEstado";
             clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await clients.GetAsync(endPoint);
-            List<ProfesionAfiliado> result = new List<ProfesionAfiliado>();
-            if (response.IsSuccessStatusCode)
+            var responseTask1 = clients.GetAsync(endPoint);
+            var responseTask2 = clients.GetAsync($"{curl}{APIs.listarprofesionestadoactivo}");
+
+            await Task.WhenAll(responseTask1, responseTask2);
+
+            var response1 = await responseTask1;
+            var response2 = await responseTask2;
+
+            if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
             {
-                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<List<ProfesionAfiliado>>(respuestaCuerpo);
+                using (var stream1 = await response1.Content.ReadAsStreamAsync())
+                using (var stream2 = await response2.Content.ReadAsStreamAsync())
+                using (var reader1 = new StreamReader(stream1))
+                using (var reader2 = new StreamReader(stream2))
+                {
+                    var respuestaCuerpo1 = await reader1.ReadToEndAsync();
+                    var respuestaCuerpo2 = await reader2.ReadToEndAsync();
+
+                    var result = JsonConvert.DeserializeObject<List<ProfesionAfiliado>>(respuestaCuerpo1);
+                    var profesiones = JsonConvert.DeserializeObject<List<Profesion>>(respuestaCuerpo2);
+
+                    var diccionarioProfesiones = profesiones.ToDictionary(p => p.RowKey, p => p.NombreProfesion);
+
+                    foreach (var item in result)
+                    {
+                        if (diccionarioProfesiones.TryGetValue(item.Idprofesion, out string nombreProfesion))
+                        {
+                            item.Idprofesion = nombreProfesion;
+                        }
+                    }
+
+                    return result;
+                }
             }
-            return result;
+            else
+            {
+                return new List<ProfesionAfiliado>();
+            }
         }
+
+
+
 
         public async Task<List<ProfesionAfiliado>> ListarProfesionAfiliado(string token)
         {
@@ -115,6 +151,20 @@ namespace Coling.Vista.Servicios.Afiliados
             {
                 string respuestaCuerpo = await response.Content.ReadAsStringAsync();
                 result = JsonConvert.DeserializeObject<ProfesionAfiliado>(respuestaCuerpo);
+            }
+            return result;
+        }
+
+        public async Task<List<Afiliado>> ListarAfiliado(string token)
+        {
+            endPoint = "api/ListarAfiliadoEstadoActivo";
+            clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await clients.GetAsync(endPoint);
+            List<Afiliado> result = new List<Afiliado>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<Afiliado>>(respuestaCuerpo);
             }
             return result;
         }

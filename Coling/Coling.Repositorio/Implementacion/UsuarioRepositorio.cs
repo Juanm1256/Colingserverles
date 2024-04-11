@@ -1,4 +1,5 @@
 ﻿using Coling.Repositorio.Contratos;
+using Coling.Shared;
 using DAL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -56,7 +57,7 @@ namespace Coling.Repositorio.Implementacion
             return Encriptado;
         }
 
-        public async Task<bool> Insertar(int Idusuario, string usuariox, string passwordx, string rol, string estado)
+        public async Task<bool> Insertar(string Idusuario, string usuariox, string passwordx, string rol, string estado)
         {
             string passEncriptado = await EncriptarPassword(passwordx);
             string consulta = "INSERT INTO Usuario (idusuario, nombreuser, password, rol, estado) VALUES (@Idusuario ,@usuario, @password, @rol, @estado)";
@@ -69,6 +70,28 @@ namespace Coling.Repositorio.Implementacion
             {
                 return false;
             }
+        }
+
+        public async Task<bool> Modificar(string Idusuario, string usuariox, string passwordx, string rol, string estado)
+        {
+            string passEncriptado = await EncriptarPassword(passwordx);
+            string consulta = "UPDATE Usuario SET nombreuser = @usuario, password = @password, rol = @rol, estado = @estado WHERE idusuario = @Idusuario";
+            bool exito = conexion.Insertardatas(consulta, Idusuario, usuariox, passEncriptado, rol, estado);
+            if (exito)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<RegistrarUsuario> Obtenerid(string Idusuario)
+        {
+            string consulta = "SELECT idusuario, nombreuser, password, rol, estado FROM Usuario WHERE idusuario = @Idusuario";
+            RegistrarUsuario usuario = conexion.Obtenerdata(consulta, Idusuario);
+            return usuario;
         }
 
         public Task<bool> ValidarToken(string token)

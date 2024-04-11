@@ -1,7 +1,9 @@
-﻿using Coling.Shared;
+﻿using Azure;
+using Coling.Shared;
 using Coling.Shared.DTOs;
 using Coling.Vista.Modelos;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,44 +109,78 @@ namespace Coling.Vista.Servicios.Afiliados
             return sw;
         }
 
-        public async Task<Persona> ObtenerPorId(int id, string token)
+        public async Task<PerTelDir> ObtenerPorId(int id, string token)
         {
-            endPoint = url + $"api/ObtenerPersona/{id}";
+            string idper = id.ToString();
+            endPoint = url + $"api/ObtenerAll/{id}";
             clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var responseTask1 = clients.GetAsync(endPoint);
+            var responseTask2 = clients.GetAsync($"{baseurl}{APIs.obteneruser}{idper}");
 
-            HttpResponseMessage response = await clients.GetAsync(endPoint);
-            Persona result = new Persona();
-            if (response.IsSuccessStatusCode)
+            await Task.WhenAll(responseTask1, responseTask2);
+
+            var response1 = await responseTask1;
+            var response2 = await responseTask2;
+            PerTelDir result = new PerTelDir();
+            if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
             {
-                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<Persona>(respuestaCuerpo);
+                using (var stream1 = await response1.Content.ReadAsStreamAsync())
+                using (var stream2 = await response2.Content.ReadAsStreamAsync())
+                using (var reader1 = new StreamReader(stream1))
+                using (var reader2 = new StreamReader(stream2))
+                {
+                    var respuestaCuerpo1 = await reader1.ReadToEndAsync();
+                    var respuestaCuerpo2 = await reader2.ReadToEndAsync();
+
+                    result = JsonConvert.DeserializeObject<PerTelDir>(respuestaCuerpo1);
+                    var usuario = JsonConvert.DeserializeObject<RegistrarUsuario>(respuestaCuerpo2);
+                    usuario.Password = "";
+                    result.registrarUsuario = usuario;
+
+                }
             }
+
             return result;
         }
 
         public async Task<bool> InsertarAll(PerTelDir registroperteldir, string token)
         {
-            bool sw = false;
-            endPoint = url + "api/InsertarAllPersona";
-            string jsonBody = JsonConvert.SerializeObject(registroperteldir);
-            clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-            var respuesta = await clients.PostAsync(endPoint, content);
-            if (respuesta != null)
+            try
             {
-                using (var client = new HttpClient())
+                bool sw = false;
+                endPoint = url + "api/InsertarAllPersona";
+                string jsonBody = JsonConvert.SerializeObject(registroperteldir);
+                clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                var respuesta = await clients.PostAsync(endPoint, content);
+                if (respuesta.IsSuccessStatusCode)
                 {
-                    var url = $"{baseurl}{APIs.insertaruser}";
-
-                    var serializedStr = JsonConvert.SerializeObject(registroperteldir.registrarUsuario);
-                    var response = await client.PostAsync(url, new StringContent(serializedStr, Encoding.UTF8, "application/json"));
-                    if (response.IsSuccessStatusCode)
+                    var responseBody = await respuesta.Content.ReadAsStringAsync();
+                    var jsonObject = JObject.Parse(responseBody);
+                    var idInsertado = jsonObject["Idinsertado"].ToString();
+                    if (idInsertado!=null)
                     {
-                        sw = true;
+                        registroperteldir.registrarUsuario.Id = idInsertado;
+                        using (var client = new HttpClient())
+                        {
+                            var url = $"{baseurl}{APIs.insertaruser}";
+
+                            var serializedStr = JsonConvert.SerializeObject(registroperteldir.registrarUsuario);
+                            var response = await client.PostAsync(url, new StringContent(serializedStr, Encoding.UTF8, "application/json"));
+                            if (response.IsSuccessStatusCode)
+                            {
+                                sw = true;
+                            }
+                        }
                     }
                 }
+                return sw;
             }
-            return sw;
+            catch (Exception)
+            {
+                return false;
+            }
+            
         }
     }
 }

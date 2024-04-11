@@ -12,5 +12,6 @@ namespace Coling.Utilitarios.Roles
         public const string Admin = "Admin";
         public const string Afiliado = "Afiliado";
         public const string Secretaria = "Secretaria";
+        public const string Institucion = "Institucion";
     }
 }

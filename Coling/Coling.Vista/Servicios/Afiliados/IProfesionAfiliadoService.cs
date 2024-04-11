@@ -1,4 +1,5 @@
 ﻿using Coling.Shared;
+using Coling.Vista.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Coling.Vista.Servicios.Afiliados
         Task<List<ProfesionAfiliado>> ListarProfesionAfiliado(string token);
         Task<List<ProfesionAfiliado>> ListarEstado(string token);
         Task<List<ProfesionAfiliado>> ListarPorNombre(string nombre, string token);
+        Task<List<Afiliado>> ListarAfiliado(string token);
         Task<bool> Insertar(ProfesionAfiliado profesionAfiliado, string token);
         Task<bool> Modificar(ProfesionAfiliado profesionAfiliado, int id, string token);
         Task<bool> Eliminar(int id, string token);

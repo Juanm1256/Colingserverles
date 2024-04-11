@@ -18,6 +18,6 @@ namespace Coling.Shared
         public string? Estado { get; set; }
 
         [ForeignKey("Idpersona")]
-        public virtual Persona IdPersonanav { get; set; } 
+        public Persona IdPersonanav { get; set; } 
     }
 }

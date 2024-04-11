@@ -1,10 +1,5 @@
 ﻿html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: normal;
-    font-size: 100%;
-    color: #1b262c;
-    margin: 0;
-    background-color: #5f6769;
 }
 /*
     Inicio Login
@@ -214,29 +209,53 @@ a, .btn-link {
     background-color: #1b6ec2;
     border-color: #1861ac;
 }
+
+
+/*Inicio Diseño Table en todas*/
+
+.containertable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    min-width: 50vw;
+    min-height: 50vh;
+    width: 60%;
+    height: 40%;
+    margin-left: 20%;
+    margin-right: 20%;
+    background-position: center;
+    background-size: cover;
+    overflow-x: auto;
+}
+
 table {
     width: 500px;
     margin: 30px auto;
     table-layout: auto;
     border-collapse: collapse;
+    text-align: center;
 }
 
 th,
 td {
-    border: 1px solid #ddd;
+    border: 1px solid #333;
     padding: 8px;
     text-align: center;
-    background-color: white;
+    background-color: black;
 }
 
 tr:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 4px 4px 4px 4px rgba(0, 0, 0, 0.2);
+    background-color: black;
 }
 
 th {
     background-color: #333;
     color: white;
+    text-align: center;
 }
 
     th:hover {
@@ -244,8 +263,13 @@ th {
         transition: background-color 0.3s;
     }
 
+
+/*Fin Diseño Table en todas*/
+
+
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #D0D3D4;
 }
 
 .content {

@@ -15,7 +15,7 @@ namespace Coling.Shared
 
         [Column("IDAFILIADO")]
         public int Idafiliado { get; set; }
-        public int Idprofesion { get; set; }
+        public string Idprofesion { get; set; }
         public DateTime fechaasignacion { get; set; }
         public string? Nrosellosib { get; set; }
         public string? Estado { get; set; }

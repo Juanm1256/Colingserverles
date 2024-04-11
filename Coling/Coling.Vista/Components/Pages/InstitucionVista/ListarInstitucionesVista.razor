@@ -37,6 +37,24 @@
                                 <ValidationMessage For="@(()=>institucion.Direccion)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicionuser" OnValidSubmit="GuardarCambios">
+                        <div class="mb-3">
+                            <label>Nombre Usuario:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@regisuser.UserName"></InputText>
+                                <ValidationMessage For="@(()=>regisuser.UserName)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Password:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@regisuser.Password"></InputText>
+                                <ValidationMessage For="@(()=>regisuser.Password)"></ValidationMessage>
+                            </div>
+                        </div>
+
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
                             <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
@@ -107,9 +125,12 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionuser;
     private string modalTitle = "Crear Institución";
     private string modalButtonLabel = "Crear";
     private Institucion institucion = new Institucion();
+    private RegistrarUsuario regisuser= new RegistrarUsuario();
+    private InstituUser instituUser= new InstituUser();
     private bool mostrarModal = false;
     private string filtroNombre; 
     private List<Institucion> InstitucionListaPaginada { get; set; } = new List<Institucion>();
@@ -137,6 +158,7 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(institucion);
+                contextoEdicionuser = new EditContext(regisuser);
                 await CargarInstituciones();
             }
         }
@@ -148,7 +170,7 @@
 
     async Task CargarInstituciones()
     {
-        
+
         InstitucionLista = await servicioinstitucion.ListarEstado(token);
         await ActualizarListaPaginada();
     }
@@ -184,7 +206,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)InstitucionLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        
+
 
         if (!string.IsNullOrEmpty(institucion.RowKey))
         {
@@ -218,7 +240,9 @@
         {
             institucion.PartitionKey = "Educacion";
             institucion.Estado = "Activo";
-            var respuesta = await servicioinstitucion.InsertarInstitucion(institucion, token);
+            instituUser.institucion = institucion;
+            instituUser.registrarUsuario = regisuser;
+            var respuesta = await servicioinstitucion.InsertarInstitucion(instituUser, token);
             if (!respuesta)
             {
                 await sweetAlertService.FireAsync("Error", "No se pudo guardar", SweetAlertIcon.Error);
@@ -285,7 +309,9 @@
     private void AbrirModalCrear()
     {
         institucion = new Institucion();
+        regisuser = new RegistrarUsuario();
         contextoEdicion = new EditContext(institucion);
+        contextoEdicionuser = new EditContext(regisuser);
         modalTitle = "Crear Institución";
         modalButtonLabel = "Crear";
         mostrarModal = true;
@@ -295,7 +321,9 @@
     {
         
         institucion = await servicioinstitucion.ObtenerInstitucionPorId(rowKey, token);
+        regisuser = await servicioinstitucion.ObteneruserPorId(rowKey, token);
         contextoEdicion = new EditContext(institucion);
+        contextoEdicionuser = new EditContext(regisuser);
         modalTitle = "Modificar Institución";
         modalButtonLabel = "Guardar Cambios";
         mostrarModal = true;

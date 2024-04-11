@@ -24,7 +24,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ListarSolicitud")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado)]
         [OpenApiOperation("Listarspec", "Solicitud", Description = " Sirve para listar todas las Solicitudes")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Solicitud>), Description = "Mostrar una lista de Solicitudes")]
 
@@ -91,7 +91,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("InsertarSolicitud")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado)]
         [OpenApiOperation("Insertarspec", "Solicitud", Description = " Sirve para listar todas las Solicitudes")]
         [OpenApiRequestBody("application/json", typeof(Solicitud), Description = "Oferta Laboral modelo")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Solicitud), Description = "Insertara la Oferta Laboral.")]
@@ -123,7 +123,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ModificarSolicitud")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado)]
         [OpenApiOperation("ModificarSolicitud", "Solicitud", Summary = "Modifica una Solicitud existente en el sistema.")]
         [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID de la solicitud", Description = "El ID de la Solicitud a modificar.")]
         [OpenApiRequestBody("application/json", typeof(Solicitud), Description = "Objeto de tipo Solicitud que representa la solicitud a modificar.")]
@@ -188,7 +188,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ObtenerSolicitud")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado)]
         [OpenApiOperation("Listarspec", "Solicitud", Description = " Sirve para obtener la Solicitud")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la solicitud a obtener la solicitud")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Solicitud>), Description = "Datos de la Solicitud correspondiente al ID proporcionado.")]
