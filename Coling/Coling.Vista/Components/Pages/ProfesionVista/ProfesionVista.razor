@@ -1,5 +1,6 @@
 ﻿@page "/profesion"
 
+@inject IGradoAcademicoService serviciogra
 @inject IProfesionService servicio
 @inject NavigationManager nav
 @inject SweetAlertService sweetAlertService
@@ -23,13 +24,27 @@
                                 <ValidationMessage For="@(()=>profesion.NombreProfesion)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicionGradoA" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
-                            <label>Grado:</label>
+                            <label>Grado Academico:</label>
                             <div>
-                                <InputText class="form-control" @bind-Value="@profesion.Idgrado"></InputText>
-                                <ValidationMessage For="@(()=>profesion.Idgrado)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="FilterGradoA" placeholder="Buscar Grado Academico...">
+                                <select class="form-control" @bind="@gradoa.RowKey">
+                                    @if (filteredGradoA.Any())
+                                    {
+                                        <option value="0">Selecciona Grado Academico</option>
+                                        foreach (var per in filteredGradoA)
+                                        {
+                                            <option value="@per.RowKey">@($"{per.NombreGrado}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>gradoa.RowKey)"></ValidationMessage>
                             </div>
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
                             <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
@@ -100,12 +115,16 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionGradoA;
     private string modalTitle = "Crear Profesion";
     private string modalButtonLabel = "Crear";
     private Profesion profesion = new Profesion();
+    private GradoAcademico gradoa = new GradoAcademico();
     private bool mostrarModal = false;
     private string filtroNombre;
     private List<Profesion> ProfesionListaPaginada { get; set; } = new List<Profesion>();
+    private List<GradoAcademico> allgradoa = new List<GradoAcademico>();
+    private List<GradoAcademico> filteredGradoA = new List<GradoAcademico>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token;
@@ -130,7 +149,9 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(profesion);
+                contextoEdicionGradoA = new EditContext(gradoa);
                 await CargarProfesion();
+                await CargarGradoA();
             }
         }
         else
@@ -141,9 +162,10 @@
 
     async Task CargarProfesion()
     {
-        
+
         ProfesionLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
+        await CargarGradoA();
     }
 
     private async Task ActualizarListaPaginada()
@@ -177,7 +199,7 @@
     private int TotalPaginas => (int)Math.Ceiling((double)ProfesionLista.Count / pageSize);
     private async Task GuardarCambios()
     {
-        
+
 
         if (!string.IsNullOrEmpty(profesion.RowKey))
         {
@@ -211,6 +233,7 @@
         {
             profesion.PartitionKey = "Educacion";
             profesion.Estado = "Activo";
+            profesion.Idgrado = gradoa.RowKey;
             var respuesta = await servicio.Insertar(profesion, token);
             if (!respuesta)
             {
@@ -278,7 +301,9 @@
     private void AbrirModalCrear()
     {
         profesion = new Profesion();
+        gradoa = new GradoAcademico();
         contextoEdicion = new EditContext(profesion);
+        contextoEdicionGradoA = new EditContext(gradoa);
         modalTitle = "Crear Profesion";
         modalButtonLabel = "Crear";
         mostrarModal = true;
@@ -382,6 +407,22 @@
         }
 
     }
+
+    private void FilterGradoA(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredGradoA = allgradoa
+            .Where(p => (p.NombreGrado).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    private async Task CargarGradoA()
+    {
+        allgradoa = await serviciogra.ListarGradoEstadoActivo(token);
+        filteredGradoA = allgradoa.ToList();
+    }
+
+
     private void CerrarModal()
     {
         mostrarModal = false;

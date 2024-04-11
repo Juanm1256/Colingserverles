@@ -113,5 +113,17 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
                 return false;
             }
         }
+
+        public async Task<List<TipoEstudio>> GetallTipoEstudiostatus()
+        {
+            List<TipoEstudio> lista = new List<TipoEstudio>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo'";
+            await foreach (TipoEstudio tipoEstudio in tablaCliente.QueryAsync<TipoEstudio>(filter: filtro))
+            {
+                lista.Add(tipoEstudio);
+            }
+            return lista;
+        }
     }
 }

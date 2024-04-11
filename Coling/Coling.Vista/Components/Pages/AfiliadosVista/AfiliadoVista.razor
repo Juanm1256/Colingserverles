@@ -79,7 +79,7 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por Nombre" />
 </div>
 
 <div class="container">
@@ -146,6 +146,7 @@
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token="";
+    private DateTime fechaAfiliacionOriginal;
 
     public List<Afiliado> AfiliadoLista { get; set; } = new List<Afiliado>();
 
@@ -166,6 +167,7 @@
             {
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
+                afiliado.fechaafiliacion = DateTime.Today;
                 contextoEdicion = new EditContext(afiliado);
                 contextoEdicionPersona = new EditContext(persona);
                 await CargarAfiliado();
@@ -222,6 +224,7 @@
 
         if (afiliado.Id > 0)
         {
+            afiliado.fechaafiliacion = fechaAfiliacionOriginal;
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
@@ -330,6 +333,7 @@
     {
 
         afiliado = await servicio.ObtenerPorId(id, token);
+        fechaAfiliacionOriginal = afiliado.fechaafiliacion;
         contextoEdicion = new EditContext(afiliado);
         modalTitle = "Modificar Afiliado";
         modalButtonLabel = "Guardar Cambios";
@@ -425,7 +429,7 @@
 
     }
 
-    void FilterPersons(ChangeEventArgs e)
+    private void FilterPersons(ChangeEventArgs e)
     {
         string filter = e.Value.ToString().ToLower();
         filteredPersons = allPersons
@@ -433,7 +437,7 @@
             .ToList();
     }
 
-    async Task CargarPersonas()
+    private async Task CargarPersonas()
     {
         allPersons = await servicio.ListarPersona(token);
         filteredPersons = allPersons.ToList();

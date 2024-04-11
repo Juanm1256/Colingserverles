@@ -19,7 +19,7 @@
                         <div class="mb-3">
                             <label>Nombre Tipo Social:</label>
                             <div>
-                                <input type="text" class="form-control" @oninput="FilterTipoSocial" placeholder="Buscar persona...">
+                                <input type="text" class="form-control" @oninput="FilterTipoSocial" placeholder="Buscar Tipo Social...">
                                 <select class="form-control" @bind="@tiposocial.Id">
                                     @if (filteredTipoSocial.Any())
                                     {
@@ -85,7 +85,7 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por Nombre de Persona" />
 </div>
 
 <div>
@@ -188,7 +188,7 @@
         }
     }
 
-    async Task CargarPersonaTipoSocial()
+    private async Task CargarPersonaTipoSocial()
     {
 
         PersonaTipoSocialLista = await servicio.ListarEstado(token);
@@ -235,7 +235,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas modificar este registro de PersonaTipoSocial?",
+                    Text = "¿Deseas modificar este registro de Persona Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Modificar",
@@ -294,7 +294,7 @@
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Estás seguro?",
-                Text = "¿Deseas borrar este registro de PersonaTipoSocial?",
+                Text = "¿Deseas borrar este registro de Persona Tipo Social?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Sí, borrarlo",
@@ -359,7 +359,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas desactivar este registro de PersonaTipoSocial?",
+                    Text = "¿Deseas desactivar este registro de Persona Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Desactivar",
@@ -390,7 +390,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas Activar este registro de PersonaTipoSocial?",
+                    Text = "¿Deseas Activar este registro de Persona Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Activar",

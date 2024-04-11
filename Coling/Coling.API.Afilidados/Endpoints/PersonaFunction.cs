@@ -26,7 +26,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarPersonas")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarPersonas", "Persona", Description = "Listar Personas")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Persona>))]
         public async Task<HttpResponseData> ListarPersonas([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPersonas")] HttpRequestData req)
@@ -71,7 +71,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarPersonasEstadoActivo")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarPersonasactivo", "Persona", Description = "Listar Personas activas")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Persona>))]
         public async Task<HttpResponseData> ListarPersonasEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPersonasEstadoActivo")] HttpRequestData req)
@@ -216,6 +216,32 @@ namespace Coling.API.Afilidados.Endpoints
                 var listapersonas = personaLogic.ObtenerPersonaById(id);
                 var respuesta = req.CreateResponse(HttpStatusCode.OK);
                 await respuesta.WriteAsJsonAsync(listapersonas.Result);
+                return respuesta;
+            }
+            catch (Exception e)
+            {
+                var error = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await error.WriteAsJsonAsync(e.Message);
+                return error;
+            }
+
+        }
+
+
+        [Function("ObtenerAll")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
+        [OpenApiOperation("ObtenerAll", "Persona", Description = "Obtener ObtenerAll")]
+        [OpenApiParameter("id", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(PerTelDir))]
+        public async Task<HttpResponseData> ObtenerAll([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ObtenerAll/{id}")] HttpRequestData req, int id)
+        {
+
+            _logger.LogInformation("Ejecutando azure function para eliminar personas.");
+            try
+            {
+                var listapersonas = await personaLogic.ObtenerAllById(id);
+                var respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(listapersonas);
                 return respuesta;
             }
             catch (Exception e)

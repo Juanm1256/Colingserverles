@@ -15,6 +15,7 @@ namespace Coling.API.Curriculum.Contrato.Repositorios
         public Task<bool> Delete(string partitionkey, string rowkey);
         public Task<List<Profesion>> Getall();
         public Task<List<Profesion>> Getallstatus();
+        public Task<List<Profesion>> Getallstatusactivo();
         public Task<List<Profesion>> ListarPorNombre(string nombre);
         public Task<Profesion> Get(string id);
     }

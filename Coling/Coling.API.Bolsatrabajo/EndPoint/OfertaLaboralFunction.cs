@@ -24,7 +24,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ListarOferta")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("Listarspec", "OfertaLaboral", Description = " Sirve para listar todas las Ofertas Laborales")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Mostrar una lista de Ofertas Laborales")]
 
@@ -45,7 +45,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("InsertarOfertaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("Insertarspec", "OfertaLaboral", Description = " Sirve para listar todas las Ofertas Laborales")]
         [OpenApiRequestBody("application/json", typeof(OfertaLaboral), Description = "Oferta Laboral modelo")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(OfertaLaboral), Description = "Insertara la Oferta Laboral.")]
@@ -76,7 +76,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ListarOfertaLaboralEstado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("listarOfertaLaboral", "OfertaLaboral", Description = "Listar OfertaLaboral")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<OfertaLaboral>))]
         public async Task<HttpResponseData> ListarOfertaLaboralEstado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarOfertaLaboralEstado")] HttpRequestData req)
@@ -98,7 +98,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
 
         }
         [Function("ListarOfertaLaboralPorNombre")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("listarOfertaLaboral", "OfertaLaboral", Description = "Listar OfertaLaboral")]
         [OpenApiParameter("nombre", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<OfertaLaboral>))]
@@ -122,7 +122,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ModificarOferta")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("ModificarOfertaLaboral", "OfertaLaboral", Summary = "Modifica una oferta laboral existente en el sistema.")]
         [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID de la oferta laboral", Description = "El ID de la oferta laboral a modificar.")]
         [OpenApiRequestBody("application/json", typeof(OfertaLaboral), Description = "Objeto de tipo OfertaLaboral que representa la oferta laboral a modificar.")]
@@ -183,7 +183,7 @@ namespace Coling.API.Bolsatrabajo.EndPoint
         }
 
         [Function("ObtenerOfertaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria + "," + AplicacionRoles.Institucion)]
         [OpenApiOperation("Listarspec", "OfertaLaboral", Description = " Sirve para obtener la oferta Laboral")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "ID de la oferta a obtener la oferta Laboral")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<OfertaLaboral>), Description = "Datos de la oferta Laboral correspondiente al ID proporcionado.")]

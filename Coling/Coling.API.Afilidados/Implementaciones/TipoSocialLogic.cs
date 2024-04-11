@@ -63,9 +63,8 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<TipoSocial>> ListarTipoSocialPorNombre(string nombre)
         {
-            var listar = await contexto.TipoSocials.ToListAsync();
-            var respuesta = listar.Where(x => x.NombreSocial == nombre);
-            return respuesta.ToList();
+            var listar = await contexto.TipoSocials.Where(x => x.NombreSocial == nombre).ToListAsync();
+            return listar;
         }
 
         public async Task<bool> ModificarTipoSocial(TipoSocial tipoSocial, int id)

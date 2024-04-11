@@ -78,7 +78,7 @@ namespace Coling.API.Curriculum.Endpoints
 
         [Function("ListarProfesionEstado")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiOperation("Listarproestadospec", "Profesion")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Profesion))]
         public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
@@ -98,9 +98,31 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
 
+        [Function("ListarProfesionEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin)]
+        [OpenApiOperation("ListarProfesionEstadoActivo", "Profesion")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Profesion))]
+        public async Task<HttpResponseData> ListarProfesionEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = await repos.Getallstatusactivo();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
         [Function("ListarPorNombreProfesion")]
         [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [OpenApiOperation("ListarPorNombreProfesion", "Profesion")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Profesion))]
         public async Task<HttpResponseData> ListarPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPorNombreProfesion/{nombre}")] HttpRequestData req, string nombre)

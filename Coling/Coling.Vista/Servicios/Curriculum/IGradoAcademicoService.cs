@@ -11,6 +11,7 @@ namespace Coling.Vista.Servicios.Curriculum
     {
         Task<List<GradoAcademico>> Listar(string token);
         Task<List<GradoAcademico>> ListarEstado(string token);
+        Task<List<GradoAcademico>> ListarGradoEstadoActivo(string token);
         Task<List<GradoAcademico>> ListarPorNombre(string nombre, string token);
         Task<bool> Insertar(GradoAcademico gradoAcademico, string token);
         Task<bool> Modificar(GradoAcademico gradoAcademico, string token);

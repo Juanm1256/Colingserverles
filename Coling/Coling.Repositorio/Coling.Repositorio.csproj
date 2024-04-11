@@ -13,4 +13,8 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Coling.Shared\Coling.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

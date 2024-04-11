@@ -1,6 +1,7 @@
 ﻿@page "/profesionAfiliado"
 
 @inject IProfesionAfiliadoService servicio
+@inject IProfesionService serviceProf
 @inject NavigationManager nav
 @inject SweetAlertService sweetAlertService
 
@@ -35,15 +36,29 @@
                             </div>
                         </div>
                     </EditForm>
-                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                    <EditForm EditContext="contextoEdicionProfesion" OnValidSubmit="GuardarCambios">
                         <DataAnnotationsValidator />
                         <div class="mb-3">
-                            <label>Profesion:</label>
+                            <label>Profesión:</label>
                             <div>
-                                <InputNumber class="form-control" @bind-Value="@profesionAfiliado.Idprofesion"></InputNumber>
-                                <ValidationMessage For="@(()=>profesionAfiliado.Idprofesion)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="FilterProfesion" placeholder="Buscar Profesión...">
+                                <select class="form-control" @bind="@profesion.RowKey">
+                                    @if (filteredProfesion.Any())
+                                    {
+                                        <option value="0">Selecciona Profesion</option>
+                                        foreach (var per in filteredProfesion)
+                                        {
+                                            <option value="@per.RowKey">@($"{per.NombreProfesion} {per.Idgrado}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>profesion.NombreProfesion)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
                             <label>Fecha Asignación:</label>
                             <div>
@@ -134,15 +149,20 @@
 
     private EditContext contextoEdicion;
     private EditContext contextoEdicionAfiliado;
+    private EditContext contextoEdicionProfesion;
     private string modalTitle = "Crear ProfesionAfiliado";
     private string modalButtonLabel = "Crear";
     private ProfesionAfiliado profesionAfiliado = new ProfesionAfiliado();
     private Afiliado afiliado = new Afiliado();
+    private Profesion profesion = new Profesion();
     private bool mostrarModal = false;
     private string filtroNombre;
+    private string seleccionadoProfesion;
     private List<ProfesionAfiliado> ProfesionAfiliadoListaPaginada { get; set; } = new List<ProfesionAfiliado>();
     private List<Afiliado> allAfiliado = new List<Afiliado>();
+    private List<Profesion> allProfesion = new List<Profesion>();
     private List<Afiliado> filteredAfiliado = new List<Afiliado>();
+    private List<Profesion> filteredProfesion = new List<Profesion>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token = "";
@@ -168,8 +188,10 @@
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(profesionAfiliado);
                 contextoEdicionAfiliado = new EditContext(afiliado);
+                contextoEdicionProfesion = new EditContext(profesion);
                 await CargarProfesionAfiliado();
                 await CargarAfiliado();
+                await CargarProfesion();
             }
         }
         else
@@ -178,12 +200,13 @@
         }
     }
 
-    async Task CargarProfesionAfiliado()
+    private async Task CargarProfesionAfiliado()
     {
 
         ProfesionAfiliadoLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
         await CargarAfiliado();
+        await CargarProfesion();
     }
 
     private async Task ActualizarListaPaginada()
@@ -215,10 +238,10 @@
     private bool EsPaginaInicial => paginaActual == 1;
     private bool EsPaginaFinal => paginaActual == TotalPaginas;
     private int TotalPaginas => (int)Math.Ceiling((double)ProfesionAfiliadoLista.Count / pageSize);
+
+
     private async Task GuardarCambios()
     {
-
-
         if (profesionAfiliado.Id > 0)
         {
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
@@ -251,6 +274,7 @@
         {
             profesionAfiliado.Estado = "Activo";
             profesionAfiliado.Idafiliado = afiliado.Id;
+            profesionAfiliado.Idprofesion = profesion.RowKey;
             var respuesta = await servicio.Insertar(profesionAfiliado, token);
             if (!respuesta)
             {
@@ -278,7 +302,7 @@
 
     private async Task EliminarProfesionAfiliado(int RK)
     {
-        
+
         profesionAfiliado = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -319,8 +343,10 @@
     {
         profesionAfiliado = new ProfesionAfiliado();
         afiliado = new Afiliado();
+        profesion = new Profesion();
         contextoEdicion = new EditContext(profesionAfiliado);
         contextoEdicionAfiliado = new EditContext(afiliado);
+        contextoEdicionProfesion = new EditContext(profesion);
         modalTitle = "Crear Profesion Afiliado";
         modalButtonLabel = "Crear";
         mostrarModal = true;
@@ -328,7 +354,7 @@
 
     private async Task AbrirModalModificar(int id)
     {
-        
+
         profesionAfiliado = await servicio.ObtenerPorId(id, token);
         contextoEdicion = new EditContext(profesionAfiliado);
         modalTitle = "Modificar Profesion Afiliado";
@@ -338,7 +364,7 @@
 
     private async Task cambiarestado(int id, string estado)
     {
-        
+
         if (estado == "Activo")
         {
             profesionAfiliado = await servicio.ObtenerPorId(id, token);
@@ -410,7 +436,7 @@
     }
     private async Task BuscarPorNombre(ChangeEventArgs e)
     {
-        
+
         filtroNombre = e.Value.ToString();
         if (!string.IsNullOrEmpty(filtroNombre))
         {
@@ -425,7 +451,7 @@
 
     }
 
-    void FilterAfiliado(ChangeEventArgs e)
+    private void FilterAfiliado(ChangeEventArgs e)
     {
         string filter = e.Value.ToString().ToLower();
         filteredAfiliado = allAfiliado
@@ -433,14 +459,29 @@
             .ToList();
     }
 
-    async Task CargarAfiliado()
+    private async Task CargarAfiliado()
     {
         allAfiliado = await servicio.ListarAfiliado(token);
         filteredAfiliado = allAfiliado.ToList();
     }
 
+    private void FilterProfesion(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredProfesion = allProfesion
+            .Where(p => (p.NombreProfesion).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    private async Task CargarProfesion()
+    {
+        allProfesion = await serviceProf.ListarProfesionEstadoActivo(token);
+        filteredProfesion = allProfesion.ToList();
+    }
+
     private void CerrarModal()
     {
+        filtroNombre = "";
         mostrarModal = false;
     }
 }

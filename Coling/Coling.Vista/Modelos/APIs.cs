@@ -10,5 +10,9 @@ namespace Coling.Vista.Modelos
     {
         public const string Authenticateuser = "api/Login";
         public const string insertaruser = "api/Insertar";
+        public const string modificaruser = "api/Modificar";
+        public const string obteneruser = "api/ObtenerId/";
+        public const string listarprofesionestadoactivo = "api/ListarProfesionEstadoActivo";
+        public const string listargradoestadoactivo = "api/ListarGradoEstadoActivo";
     }
 }

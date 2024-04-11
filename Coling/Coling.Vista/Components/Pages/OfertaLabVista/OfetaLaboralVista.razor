@@ -90,13 +90,174 @@
     </div>
 }
 
+
+@if (mostrarModalModificar)
+{
+    @if (Settings.detalleuser.rol == "Afiliado")
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                        <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label>Afiliado:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@solicitud.Afiliado"></InputText>
+                                    <ValidationMessage For="@(()=>solicitud.Afiliado)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Nombre Completo:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@solicitud.NombreCompleto"></InputText>
+                                    <ValidationMessage For="@(()=>solicitud.NombreCompleto)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Fehca Limite:</label>
+                                <div>
+                                    <InputDate class="form-control" @bind-Value="@solicitud.FechaPostulacion"></InputDate>
+                                    <ValidationMessage For="@(()=>solicitud.FechaPostulacion)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Pretencion Salarial:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@solicitud.PretencionSalarial"></InputText>
+                                    <ValidationMessage For="@(()=>solicitud.PretencionSalarial)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Acerca de:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@solicitud.Acercade"></InputText>
+                                    <ValidationMessage For="@(()=>solicitud.Acercade)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Oferta:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@solicitud.Oferta"></InputText>
+                                    <ValidationMessage For="@(()=>solicitud.Oferta)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Settings.detalleuser.rol == "Admin")
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                        <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label>Nombre Tipo Institucion:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.tipoinstitucion"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.tipoinstitucion)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Fecha Oferta:</label>
+                                <div>
+                                    <InputDate class="form-control" @bind-Value="@ofertaLaboral.FechaOferta"></InputDate>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.FechaOferta)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Fehca Limite:</label>
+                                <div>
+                                    <InputDate class="form-control" @bind-Value="@ofertaLaboral.FechaLimite"></InputDate>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.FechaLimite)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Descripción:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.Descripcion"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.Descripcion)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Titulo Cargo:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.TituloCargo"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.TituloCargo)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Tipo Contrato:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.TipoContrato"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.TipoContrato)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Tipo Trabajo:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.TipoTrabajo"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.TipoTrabajo)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Area:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.Area"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.Area)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Caracteristicas:</label>
+                                <div>
+                                    <InputText class="form-control" @bind-Value="@ofertaLaboral.Caracteristicas"></InputText>
+                                    <ValidationMessage For="@(()=>ofertaLaboral.Caracteristicas)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 <h3>Listar OfertaLaboral</h3>
 
-<div class="form-group row">
-    <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
-        CREAR
-    </button>
-</div>
+
+
+@if (Settings.detalleuser.rol == "Institucion" || Settings.detalleuser.rol == "Admin")
+{
+    <div class="form-group row">
+        <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
+            CREAR
+        </button>
+    </div>
+}
+
 
 <div class="form-group row">
     <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
@@ -134,19 +295,31 @@
                     <td>@item.Caracteristicas</td>
                     <td>@item.Estado</td>
                     <td>
+                        
                         @if (item.Estado == "Activo")
                         {
-                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
-                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                            <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
+                            @if (Settings.detalleuser.rol == "Afiliado")
+                            {
+                                <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Postularse</button>
+                            }
+                            @if (Settings.detalleuser.rol == "Admin")
+                            {
+                                <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Desactivar</button>
+                                <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                                <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
+                            }
                         }
                         @if (item.Estado == "Inactivo")
                         {
-                            <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
-                            <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
-                            <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
-                        }
+                            @if (Settings.detalleuser.rol == "Admin")
+                            {
 
+                                <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Postularse</button>
+                                <button class="btn btn-primary m-1" @onclick="() => cambiarestado(item.Id, item.Estado)">Activar</button>
+                                <button class="btn btn-primary m-1" @onclick="() => AbrirModalModificar(item.Id)">Editar</button>
+                                <button class="btn btn-danger" @onclick="() => EliminarOfertaLaboral(item.Id)">Eliminar</button>
+                            }
+                        }
                     </td>
                 </tr>
             }
@@ -166,12 +339,15 @@
     private string modalTitle = "Crear OfertaLaboral";
     private string modalButtonLabel = "Crear";
     private OfertaLaboral ofertaLaboral = new OfertaLaboral();
+    private EditContext contextoEdicionSolicitud;
+    private Solicitud solicitud = new Solicitud();
     private bool mostrarModal = false;
     private string filtroNombre;
     private List<OfertaLaboral> OfertaLaboralListaPaginada { get; set; } = new List<OfertaLaboral>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token = "";
+    private bool mostrarModalModificar = false;
 
     public List<OfertaLaboral> OfertaLaboralLista { get; set; } = new List<OfertaLaboral>();
 
@@ -193,6 +369,7 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(ofertaLaboral);
+                contextoEdicionSolicitud = new EditContext(solicitud);
                 await CargarOfertaLaboral();
             }
         }
@@ -353,7 +530,7 @@
         contextoEdicion = new EditContext(ofertaLaboral);
         modalTitle = "Modificar OfertaLaboral";
         modalButtonLabel = "Guardar Cambios";
-        mostrarModal = true;
+        mostrarModalModificar = true;
     }
 
     private async Task cambiarestado(string rowKey, string estado)
@@ -447,5 +624,6 @@
     private void CerrarModal()
     {
         mostrarModal = false;
+        mostrarModalModificar = false;
     }
 }

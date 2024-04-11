@@ -23,7 +23,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarEstudios")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Insertarspec", "Estudio")]
         [OpenApiRequestBody("application/json", typeof(Estudios))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
@@ -55,7 +55,7 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarEstudios")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarspec", "Estudio")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
         public async Task<HttpResponseData> ListarEstudios([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -77,7 +77,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ListarEstudiosEstado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
         public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -98,7 +98,7 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarPorNombreEstudioIns")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
@@ -121,7 +121,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("EstudioListarPorNombreInstitucion")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
@@ -168,7 +168,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ObtenerEstudios")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("obtenerspec", "Estudio")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]
@@ -191,7 +191,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ModificarEstudios")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("modificarspec", "Estudio")]
         [OpenApiRequestBody("application/json", typeof(Estudios))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Estudios))]

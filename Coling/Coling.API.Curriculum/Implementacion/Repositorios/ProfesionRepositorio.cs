@@ -66,9 +66,9 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             List<Profesion> lista = new List<Profesion>();
             var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
             var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo' or Estado eq 'Inactivo'";
-            await foreach (Profesion experienciaLaboral in tablaCliente.QueryAsync<Profesion>(filter: filtro))
+            await foreach (Profesion profesion in tablaCliente.QueryAsync<Profesion>(filter: filtro))
             {
-                lista.Add(experienciaLaboral);
+                lista.Add(profesion);
             }
             return lista;
         }
@@ -112,6 +112,18 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             {
                 return false;
             }
+        }
+
+        public async Task<List<Profesion>> Getallstatusactivo()
+        {
+            List<Profesion> lista = new List<Profesion>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo'";
+            await foreach (Profesion experienciaLaboral in tablaCliente.QueryAsync<Profesion>(filter: filtro))
+            {
+                lista.Add(experienciaLaboral);
+            }
+            return lista;
         }
     }
 }

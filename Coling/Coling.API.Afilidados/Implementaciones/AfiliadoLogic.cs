@@ -62,7 +62,7 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<Afiliado>> ListarAfiliadoPorNombre(string nombre)
         {
-            var listar =  await contexto.Afiliados.Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
+            var listar =  await contexto.Afiliados.Include(d => d.IdPersonanav).Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
             return listar;
         }
 

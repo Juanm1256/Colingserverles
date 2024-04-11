@@ -54,7 +54,7 @@ namespace Coling.API.Afilidados.Implementaciones
         public async Task<List<Direccion>> ListarDireccionEstado()
         {
             var respuesta = await contexto.Direccions
-                .Include(d => d.IdPersonanav) // Incluir la entidad Persona
+                .Include(d => d.IdPersonanav)
                 .Where(x => x.Estado == "Activo" || x.Estado == "Inactivo")
                 .ToListAsync();
             return respuesta;
@@ -62,7 +62,9 @@ namespace Coling.API.Afilidados.Implementaciones
 
         public async Task<List<Direccion>> ListarDireccionPorNombre(string nombre)
         {
-            var listar = await contexto.Direccions.Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
+            var listar = await contexto.Direccions
+                 .Include(d => d.IdPersonanav)
+                 .Where(x => x.IdPersonanav.Nombre == nombre).ToListAsync();
             return listar;
         }
 

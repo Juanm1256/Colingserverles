@@ -64,10 +64,10 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por Nombre" />
 </div>
 
-<div class="containertable">
+<div>
     <table class="table">
         <thead>
             <tr>
@@ -407,7 +407,7 @@
 
     }
 
-    void FilterPersons(ChangeEventArgs e)
+    private void FilterPersons(ChangeEventArgs e)
     {
         string filter = e.Value.ToString().ToLower();
         filteredPersons = allPersons
@@ -415,7 +415,7 @@
             .ToList();
     }
 
-    async Task CargarPersonas()
+    private async Task CargarPersonas()
     {
         allPersons = await servicio.ListarPersona(token);
         filteredPersons = allPersons.ToList();

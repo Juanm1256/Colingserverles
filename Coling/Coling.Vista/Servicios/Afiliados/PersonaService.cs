@@ -1,4 +1,5 @@
-﻿using Coling.Shared;
+﻿using Azure;
+using Coling.Shared;
 using Coling.Shared.DTOs;
 using Coling.Vista.Modelos;
 using Newtonsoft.Json;
@@ -108,18 +109,37 @@ namespace Coling.Vista.Servicios.Afiliados
             return sw;
         }
 
-        public async Task<Persona> ObtenerPorId(int id, string token)
+        public async Task<PerTelDir> ObtenerPorId(int id, string token)
         {
-            endPoint = url + $"api/ObtenerPersona/{id}";
+            string idper = id.ToString();
+            endPoint = url + $"api/ObtenerAll/{id}";
             clients.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var responseTask1 = clients.GetAsync(endPoint);
+            var responseTask2 = clients.GetAsync($"{baseurl}{APIs.obteneruser}{idper}");
 
-            HttpResponseMessage response = await clients.GetAsync(endPoint);
-            Persona result = new Persona();
-            if (response.IsSuccessStatusCode)
+            await Task.WhenAll(responseTask1, responseTask2);
+
+            var response1 = await responseTask1;
+            var response2 = await responseTask2;
+            PerTelDir result = new PerTelDir();
+            if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
             {
-                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<Persona>(respuestaCuerpo);
+                using (var stream1 = await response1.Content.ReadAsStreamAsync())
+                using (var stream2 = await response2.Content.ReadAsStreamAsync())
+                using (var reader1 = new StreamReader(stream1))
+                using (var reader2 = new StreamReader(stream2))
+                {
+                    var respuestaCuerpo1 = await reader1.ReadToEndAsync();
+                    var respuestaCuerpo2 = await reader2.ReadToEndAsync();
+
+                    result = JsonConvert.DeserializeObject<PerTelDir>(respuestaCuerpo1);
+                    var usuario = JsonConvert.DeserializeObject<RegistrarUsuario>(respuestaCuerpo2);
+                    usuario.Password = "";
+                    result.registrarUsuario = usuario;
+
+                }
             }
+
             return result;
         }
 

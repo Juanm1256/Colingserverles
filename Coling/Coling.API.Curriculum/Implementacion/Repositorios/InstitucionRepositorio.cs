@@ -2,6 +2,7 @@
 using Coling.API.Curriculum.Contrato.Repositorios;
 using Coling.API.Curriculum.Modelo;
 using Coling.Shared;
+using Microsoft.ApplicationInsights.Extensibility.Implementation.ApplicationId;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
@@ -91,18 +92,20 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             return lista;
         }
 
-        public async Task<bool> Insertar(Institucion institucion)
+        public async Task<string> Insertar(Institucion institucion)
         {
+            string id = "";
             try
             {
                 var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
                 await tablaCliente.UpsertEntityAsync(institucion);
-                return true;
+                id = institucion.RowKey;
+                return id;
             }
             catch (Exception)
             {
 
-                return false;
+                return id;
             }
         }
 
@@ -119,6 +122,18 @@ namespace Coling.API.Curriculum.Implementacion.Repositorios
             {
                 return false;
             }
+        }
+
+        public async Task<List<Institucion>> GetallInstitucionstatus()
+        {
+            List<Institucion> lista = new List<Institucion>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+            var filtro = $"PartitionKey eq 'Educacion' and Estado eq 'Activo'";
+            await foreach (Institucion institucion in tablaCliente.QueryAsync<Institucion>(filter: filtro))
+            {
+                lista.Add(institucion);
+            }
+            return lista;
         }
     }
 }

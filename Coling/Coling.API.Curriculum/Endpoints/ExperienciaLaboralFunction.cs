@@ -23,7 +23,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarExperienciaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("insetarspec", "ExperienciaLaboral")]
         [OpenApiRequestBody("application/json", typeof(ExperienciaLaboral))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
@@ -55,7 +55,7 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarExperienciaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarspec", "ExperienciaLaboral")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
         public async Task<HttpResponseData> ListarExperienciaLaboral([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -77,7 +77,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ListarExpLabosEstado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
         public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -99,7 +99,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ListarPorNombreExpeLabIns")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
@@ -123,7 +123,7 @@ namespace Coling.API.Curriculum.Endpoints
 
         /*tarea para ahora*/
         [Function("EliminarExperienciaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("eliminarspec", "ExperienciaLaboral")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
@@ -146,7 +146,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ObtenerExperienciaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("obtenerspec", "ExperienciaLaboral")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]
@@ -169,7 +169,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ModificarExperienciaLaboral")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Afiliado + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("modificarspec", "ExperienciaLaboral")]
         [OpenApiRequestBody("application/json", typeof(ExperienciaLaboral))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ExperienciaLaboral))]

@@ -24,7 +24,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("InsertarTipoEstudio")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("insetarspec", "TipoEstudio")]
         [OpenApiRequestBody("application/json", typeof(TipoEstudio))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
@@ -56,7 +56,7 @@ namespace Coling.API.Curriculum.Endpoints
             }
         }
         [Function("ListarTipoEstudio")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarspec", "TipoEstudio")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
         public async Task<HttpResponseData> ListarTipoEstudio([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -78,7 +78,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ListarTipoEstudioEstado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("Listarestadospec", "Estudio")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
         public async Task<HttpResponseData> ListarEstudiosEstado([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
@@ -100,8 +100,8 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ListarPorNombreTipoEstudio")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
-        [OpenApiOperation("Listarestadospec", "Estudio")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
+        [OpenApiOperation("Listarestadospec", "TipoEstudio")]
         [OpenApiParameter(name: "nombre", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Obtener por id", Description = "Obtener")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
         public async Task<HttpResponseData> ListarPorNombre([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarPorNombreTipoEstudio/{nombre}")] HttpRequestData req, string nombre)
@@ -121,6 +121,29 @@ namespace Coling.API.Curriculum.Endpoints
                 return respuesta;
             }
         }
+
+        [Function("ListarTipoEstudioEstadoActivo")]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
+        [OpenApiOperation("ListarTipoEstudioEstadoActivo", "TipoEstudio")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
+        public async Task<HttpResponseData> ListarTipoEstudioEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            try
+            {
+                var lista = repos.GetallTipoEstudiostatus();
+                var respuest = req.CreateResponse(HttpStatusCode.OK);
+                await respuest.WriteAsJsonAsync(lista.Result);
+                return respuest;
+
+            }
+            catch (Exception)
+            {
+
+                var respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
 
         /*tarea para ahora*/
         [Function("EliminarTipoEstudio")]
@@ -147,7 +170,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ObtenerTipoEstudio")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("obtenerspec", "TipoEstudio")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]
@@ -170,7 +193,7 @@ namespace Coling.API.Curriculum.Endpoints
         }
 
         [Function("ModificarTipoEstudio")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("modificarspec", "TipoEstudio")]
         [OpenApiRequestBody("application/json", typeof(TipoEstudio))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(TipoEstudio))]

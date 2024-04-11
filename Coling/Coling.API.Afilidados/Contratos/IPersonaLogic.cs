@@ -20,6 +20,7 @@ namespace Coling.API.Afilidados.Contratos
         public Task<List<Persona>> ListarPersonaEstadoActivo();
         public Task<List<Persona>> ListarPersonaPorNombre(string nombre);
         public Task<Persona> ObtenerPersonaById(int id);
+        public Task<PerTelDir> ObtenerAllById(int id);
 
     }
 }

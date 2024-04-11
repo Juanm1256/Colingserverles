@@ -4,7 +4,7 @@
 @inject NavigationManager nav
 @inject SweetAlertService sweetAlertService
 
-@if (mostrarModal == "Crear")
+@if (mostrarModal)
 {
     <div class="modal fade show" style="display: block;" tabindex="-1">
         <div class="modal-dialog">
@@ -84,6 +84,7 @@
                             <label>Rol:</label>
                             <div>
                                 <select class="form-control" @bind="regisuser.Rol">
+                                    <option value="0">Selecciona Rol</option>
                                     <option value="Afiliado">Afiliado</option>
                                     <option value="Admin">Admin</option>
                                     <option value="Secretaria">Secretaria</option>
@@ -101,59 +102,6 @@
         </div>
     </div>
 }
-else
-{
-    @if (mostrarModal=="Modificar")
-    {
-        <div class="modal fade show" style="display: block;" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
-                        <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
-                            <DataAnnotationsValidator />
-                            <div class="mb-3">
-                                <label>Nombre Persona:</label>
-                                <div>
-                                    <InputText class="form-control" @bind-Value="@persona.Nombre"></InputText>
-                                    <ValidationMessage For="@(()=>persona.Nombre)"></ValidationMessage>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Apellidos:</label>
-                                <div>
-                                    <InputText class="form-control" @bind-Value="@persona.Apellidos"></InputText>
-                                    <ValidationMessage For="@(()=>persona.Apellidos)"></ValidationMessage>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Fecha Nacimiento:</label>
-                                <div>
-                                    <InputDate class="form-control" @bind-Value="@persona.FechaNacimiento"></InputDate>
-                                    <ValidationMessage For="@(()=>persona.FechaNacimiento)"></ValidationMessage>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Foto:</label>
-                                <div>
-                                    <InputFile id="foto" OnChange="HandleFileSelected" />
-                                    <ValidationMessage For="@(()=>persona.Foto)"></ValidationMessage>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
-                                <button type="submit" class="btn btn-primary">@modalButtonLabel</button>
-                            </div>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-}
 
 <h3>Listar Persona</h3>
 
@@ -164,7 +112,7 @@ else
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por Nombre" />
 </div>
 
 <div>
@@ -185,8 +133,17 @@ else
                 <tr>
                     <td>@item.Nombre</td>
                     <td>@item.Apellidos</td>
-                    <td>@item.FechaNacimiento</td>
-                    <td>@item.Foto</td>
+                    <td>@item.FechaNacimiento.ToShortDateString()</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Foto))
+                        {
+                            <img src="@($"data:image/png;base64,{item.Foto}")" alt="Foto de @item.Nombre" style="width: 100px; height: 100px;" />
+                        }
+                        else
+                        {
+                            <span>No hay foto disponible</span>
+                        }
+                    </td>
                     <td>@item.Estado</td>
                     <td>
                         @if (item.Estado == "Activo")
@@ -208,6 +165,8 @@ else
         </tbody>
     </table>
 </div>
+
+
 <div>
     <!-- Botones de paginación -->
     <button class="btn btn-primary" disabled="@EsPaginaInicial" @onclick="IrAPaginaAnterior">Anterior</button>
@@ -229,12 +188,14 @@ else
     private Direccion direccion = new Direccion();
     private RegistrarUsuario regisuser = new RegistrarUsuario();
     private PerTelDir registroperteldir = new PerTelDir();
-    private string mostrarModal = "";
+    private bool mostrarModal = false;
     private string filtroNombre;
     private List<Persona> PersonaListaPaginada { get; set; } = new List<Persona>();
     private int paginaActual = 1;
     private int pageSize = 5;
     private string token = "";
+    private string rutaBaseImagenes = "../Resources/Images/";
+
 
     public List<Persona> PersonaLista { get; set; } = new List<Persona>();
 
@@ -255,6 +216,7 @@ else
             {
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
+                persona.FechaNacimiento = DateTime.Today;
                 contextoEdicion = new EditContext(persona);
                 contextoEdiciontel = new EditContext(telefono);
                 contextoEdiciondir = new EditContext(direccion);
@@ -306,22 +268,39 @@ else
     private int TotalPaginas => (int)Math.Ceiling((double)PersonaLista.Count / pageSize);
 
 
+    public string ObtenerFotoPath(string foto)
+    {
+        var fot = rutaBaseImagenes + foto;
+        return fot;
+    }
+
+
+
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        var archivo = e.File;
-
-        if (archivo != null)
+        try
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                await archivo.OpenReadStream().CopyToAsync(memoryStream);
-                var bytes = memoryStream.ToArray();
-                var base64String = Convert.ToBase64String(bytes);
+            var archivo = e.File;
 
-                // Almacena la imagen en persona.Foto
-                persona.Foto = base64String;
+            if (archivo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await archivo.OpenReadStream().CopyToAsync(memoryStream);
+                    var bytes = memoryStream.ToArray();
+                    var base64String = Convert.ToBase64String(bytes);
+
+                    // Almacena la imagen en persona.Foto
+                    persona.Foto = base64String;
+                }
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Se produjo una excepción al manejar el archivo: {ex.Message}");
+
+        }
+
     }
 
 
@@ -364,7 +343,9 @@ else
             regisuser.Estado = "Activo";
             registroperteldir.personas = persona;
             registroperteldir.telefonos = telefono;
+            registroperteldir.telefonos.Estado = "Activo";
             registroperteldir.direccions = direccion;
+            registroperteldir.direccions.Estado = "Activo";
             registroperteldir.registrarUsuario = regisuser;
             var respuesta = await servicio.InsertarAll(registroperteldir, token);
             if (!respuesta)
@@ -393,7 +374,7 @@ else
 
     private async Task EliminarPersona(int RK)
     {
-        persona = await servicio.ObtenerPorId(RK, token);
+        registroperteldir = await servicio.ObtenerPorId(RK, token);
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Estás seguro?",
@@ -441,28 +422,53 @@ else
         contextoEdicionuser = new EditContext(regisuser);
         modalTitle = "Crear Persona";
         modalButtonLabel = "Crear";
-        mostrarModal = "Crear";
+        mostrarModal = true;
     }
 
     private async Task AbrirModalModificar(int id)
     {
-        persona = await servicio.ObtenerPorId(id, token);
-        contextoEdicion = new EditContext(persona);
-        modalTitle = "Modificar Persona";
-        modalButtonLabel = "Guardar Cambios";
-        mostrarModal = "Modificar";
+        registroperteldir = await servicio.ObtenerPorId(id, token);
+
+        // Verificar que los objetos no sean nulos
+        if (registroperteldir != null && registroperteldir.personas != null && registroperteldir.telefonos != null
+            && registroperteldir.direccions != null && registroperteldir.registrarUsuario != null)
+        {
+            // Asignar los datos al objeto persona y otros objetos relacionados
+            persona = registroperteldir.personas;
+            telefono = registroperteldir.telefonos;
+            direccion = registroperteldir.direccions;
+            regisuser = registroperteldir.registrarUsuario;
+
+            // Configurar los contextos de edición
+            contextoEdicion = new EditContext(persona);
+            contextoEdiciontel = new EditContext(telefono);
+            contextoEdiciondir = new EditContext(direccion);
+            contextoEdicionuser = new EditContext(regisuser);
+
+            // Establecer el título y etiqueta del botón del modal
+            modalTitle = "Modificar Persona";
+            modalButtonLabel = "Guardar Cambios";
+
+            // Mostrar el modal
+            mostrarModal = true;
+        }
+        else
+        {
+            // Manejar la situación cuando los objetos son nulos
+            // Puedes mostrar un mensaje de error o realizar alguna otra acción apropiada
+        }
     }
 
     private async Task cambiarestado(int id, string estado)
     {
         if (estado == "Activo")
         {
-            persona = await servicio.ObtenerPorId(id, token);
+            registroperteldir = await servicio.ObtenerPorId(id, token);
 
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas desactivar este registro de institución?",
+                    Text = "¿Deseas desactivar este registro de Persona?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Desactivar",
@@ -488,12 +494,12 @@ else
         }
         else
         {
-            persona = await servicio.ObtenerPorId(id, token);
+            registroperteldir = await servicio.ObtenerPorId(id, token);
 
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas Activar este registro de institución?",
+                    Text = "¿Deseas Activar este registro de Persona?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Activar",
@@ -541,6 +547,6 @@ else
     }
     private void CerrarModal()
     {
-        mostrarModal = "";
+        mostrarModal = false;
     }
 }

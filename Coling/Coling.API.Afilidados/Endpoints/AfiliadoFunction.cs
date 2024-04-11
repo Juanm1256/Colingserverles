@@ -26,7 +26,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarAfiliado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarAfiliado", "Afiliado")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Afiliado>))]
         public async Task<HttpResponseData> ListarAfiliado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarAfiliado")] HttpRequestData req)
@@ -48,7 +48,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarAfiliadosEstado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarAfiliados", "Afiliado", Description = "Listar Afiliados")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Afiliado>))]
         public async Task<HttpResponseData> ListarAfiliadosEstado([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarAfiliadosEstado")] HttpRequestData req)
@@ -70,7 +70,7 @@ namespace Coling.API.Afilidados.Endpoints
 
         }
         [Function("ListarAfiliadosPorNombre")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarAfiliados", "Afiliado", Description = "Listar Afiliados")]
         [OpenApiParameter("nombre", In = Microsoft.OpenApi.Models.ParameterLocation.Path, Type = typeof(string))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Afiliado>))]
@@ -94,7 +94,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ListarAfiliadoEstadoActivo")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("listarAfiliadoactivo", "Afiliado", Description = "Listar Afiliado activas")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(List<Afiliado>))]
         public async Task<HttpResponseData> ListarPersonasEstadoActivo([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarAfiliadoEstadoActivo")] HttpRequestData req)
@@ -116,7 +116,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("InsertarAfiliado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("insertarAfiliado", "Afiliado")]
         [OpenApiRequestBody("application/json", bodyType: typeof(Afiliado))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Afiliado))]
@@ -170,7 +170,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ObtenerAfiliado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("obtenerAfiliado", "Afiliado")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", bodyType: typeof(Afiliado))]
@@ -193,7 +193,7 @@ namespace Coling.API.Afilidados.Endpoints
         }
 
         [Function("ModificarAfiliado")]
-        [ColingAuthorize(AplicacionRoles.Admin)]
+        [ColingAuthorize(AplicacionRoles.Admin + "," + AplicacionRoles.Secretaria)]
         [OpenApiOperation("modificarAfiliado", "Afiliado")]
         [OpenApiParameter("id", In = ParameterLocation.Path, Type = typeof(int))]
         [OpenApiRequestBody("application/json", bodyType: typeof(Afiliado))]

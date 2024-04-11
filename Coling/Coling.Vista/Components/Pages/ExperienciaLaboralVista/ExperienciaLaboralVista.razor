@@ -1,6 +1,8 @@
 ﻿@page "/experiencialaboral"
 
 @inject IExperienciaLaboralService servicio
+@inject IInstitucionService servicioinsti
+@inject IProfesionAfiliadoService servicioaf
 @inject NavigationManager nav
 @inject SweetAlertService sweetAlertService
 
@@ -14,22 +16,49 @@
                     <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                    <EditForm EditContext="contextoEdicionAfiliado" OnValidSubmit="GuardarCambios">
                         <DataAnnotationsValidator />
                         <div class="mb-3">
-                            <label>Afiliado:</label>
+                            <label>Nombre Afiliado:</label>
                             <div>
-                                <InputText class="form-control" @bind-Value="@experiencialaboral.Afiliado"></InputText>
-                                <ValidationMessage For="@(()=>experiencialaboral.Afiliado)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="FilterAfiliado" placeholder="Buscar afiliado...">
+                                <select class="form-control" @bind="@selectedAfiliadoNombre">
+                                    @if (filteredAfiliado.Any())
+                                    {
+                                        <option value="">Selecciona Afiliado</option>
+                                        @foreach (var afiliado in filteredAfiliado)
+                                        {
+                                            <option value="@($"{afiliado.IdPersonanav.Nombre} {afiliado.IdPersonanav.Apellidos}")">@($"{afiliado.IdPersonanav.Nombre} {afiliado.IdPersonanav.Apellidos}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>afiliado.Id)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+
+                    <EditForm EditContext="contextoEdicioninstitucion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
-                            <label>Institucion:</label>
+                            <label>Institución:</label>
                             <div>
-                                <InputText class="form-control" @bind-Value="@experiencialaboral.Institucion"></InputText>
-                                <ValidationMessage For="@(()=>experiencialaboral.Institucion)"></ValidationMessage>
+                                <input type="text" class="form-control" @oninput="Filterinstitucion" placeholder="Buscar Institución...">
+                                <select class="form-control" @bind="@selectedInstitucionNombre">
+                                    @if (filteredinstitucion.Any())
+                                    {
+                                        <option value="">Selecciona Afiliado</option>
+                                        @foreach (var insti in filteredinstitucion)
+                                        {
+                                            <option value="@($"{insti.Nombre}")">@($"{insti.Nombre}")</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(()=>afiliado.Id)"></ValidationMessage>
                             </div>
                         </div>
+                    </EditForm>
+                    <EditForm EditContext="contextoEdicion" OnValidSubmit="GuardarCambios">
+                        <DataAnnotationsValidator />
                         <div class="mb-3">
                             <label>Cargo Titulo:</label>
                             <div>
@@ -72,7 +101,7 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institución" />
 </div>
 
 <div>
@@ -128,15 +157,25 @@
 @code {
 
     private EditContext contextoEdicion;
+    private EditContext contextoEdicionAfiliado;
+    private EditContext contextoEdicioninstitucion;
     private string modalTitle = "Crear ExperienciaLaboral";
     private string modalButtonLabel = "Crear";
     private ExperienciaLaboral experiencialaboral = new ExperienciaLaboral();
+    private Afiliado afiliado = new Afiliado();
+    private Institucion institucion = new Institucion();
     private bool mostrarModal = false;
     private string filtroNombre;
     private string token="";
     private List<ExperienciaLaboral> ExperienciaLaboralListaPaginada { get; set; } = new List<ExperienciaLaboral>();
+    private List<Afiliado> allAfiliado = new List<Afiliado>();
+    private List<Afiliado> filteredAfiliado = new List<Afiliado>();
+    private List<Institucion> allinstitucion = new List<Institucion>();
+    private List<Institucion> filteredinstitucion = new List<Institucion>();
     private int paginaActual = 1;
     private int pageSize = 5;
+    private string selectedAfiliadoNombre;
+    private string selectedInstitucionNombre;
 
     public List<ExperienciaLaboral> ExperienciaLaboralLista { get; set; } = new List<ExperienciaLaboral>();
 
@@ -158,7 +197,11 @@
                 Settings.detalleuser = userdt;
                 token = Settings.detalleuser.Token;
                 contextoEdicion = new EditContext(experiencialaboral);
+                contextoEdicionAfiliado = new EditContext(afiliado);
+                contextoEdicioninstitucion = new EditContext(institucion);
                 await CargarExperienciaLaboral();
+                await CargarAfiliado();
+                await Cargarinstitucion();
             }
         }
         else
@@ -172,6 +215,8 @@
         
         ExperienciaLaboralLista = await servicio.ListarEstado(token);
         await ActualizarListaPaginada();
+        await CargarAfiliado();
+        await Cargarinstitucion();
     }
 
     private async Task ActualizarListaPaginada()
@@ -239,6 +284,8 @@
         {
             experiencialaboral.PartitionKey = "Educacion";
             experiencialaboral.Estado = "Activo";
+            experiencialaboral.Afiliado = selectedAfiliadoNombre;
+            experiencialaboral.Institucion = selectedInstitucionNombre;
             var respuesta = await servicio.Insertar(experiencialaboral, token);
             if (!respuesta)
             {
@@ -307,8 +354,15 @@
     {
         experiencialaboral = new ExperienciaLaboral();
         contextoEdicion = new EditContext(experiencialaboral);
+        afiliado = new Afiliado();
+        contextoEdicionAfiliado = new EditContext(afiliado);
+        institucion = new Institucion();
+        contextoEdicioninstitucion = new EditContext(institucion);
         modalTitle = "Crear ExperienciaLaboral";
         modalButtonLabel = "Crear";
+        selectedAfiliadoNombre="";
+        selectedInstitucionNombre="";
+
         mostrarModal = true;
     }
 
@@ -410,6 +464,35 @@
         }
 
     }
+
+    private void FilterAfiliado(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredAfiliado = allAfiliado
+            .Where(p => (p.IdPersonanav.Nombre + " " + p.IdPersonanav.Apellidos).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    private async Task CargarAfiliado()
+    {
+        allAfiliado = await servicioaf.ListarAfiliado(token);
+        filteredAfiliado = allAfiliado.ToList();
+    }
+
+    private void Filterinstitucion(ChangeEventArgs e)
+    {
+        string filter = e.Value.ToString().ToLower();
+        filteredinstitucion = allinstitucion
+            .Where(p => (p.Nombre).ToLower().Contains(filter))
+            .ToList();
+    }
+
+    private async Task Cargarinstitucion()
+    {
+        allinstitucion = await servicioinsti.ListarInstitucionEstadoActivo(token);
+        filteredinstitucion = allinstitucion.ToList();
+    }
+
     private void CerrarModal()
     {
         mostrarModal = false;

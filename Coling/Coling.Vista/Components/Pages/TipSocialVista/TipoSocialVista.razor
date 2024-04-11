@@ -37,7 +37,7 @@
     </div>
 }
 
-<h3>Listar TipoSocial</h3>
+<h3>Listar Tipo Social</h3>
 
 <div class="form-group row">
     <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
@@ -46,7 +46,7 @@
 </div>
 
 <div class="form-group row">
-    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por nombre de Institucion" />
+    <input class="form-control" @bind="@filtroNombre" @oninput="BuscarPorNombre" placeholder="Buscar por Nombre Tipo Social" />
 </div>
 
 <div>
@@ -95,7 +95,7 @@
 @code {
 
     private EditContext contextoEdicion;
-    private string modalTitle = "Crear TipoSocial";
+    private string modalTitle = "Crear Tipo Social";
     private string modalButtonLabel = "Crear";
     private TipoSocial tipoSocial = new TipoSocial();
     private bool mostrarModal = false;
@@ -179,7 +179,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas modificar este registro de TipoSocial?",
+                    Text = "¿Deseas modificar este registro de Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Modificar",
@@ -237,7 +237,7 @@
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Estás seguro?",
-                Text = "¿Deseas borrar este registro de TipoSocial?",
+                Text = "¿Deseas borrar este registro de Tipo Social?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Sí, borrarlo",
@@ -273,7 +273,7 @@
     {
         tipoSocial = new TipoSocial();
         contextoEdicion = new EditContext(tipoSocial);
-        modalTitle = "Crear TipoSocial";
+        modalTitle = "Crear Tipo Social";
         modalButtonLabel = "Crear";
         mostrarModal = true;
     }
@@ -283,7 +283,7 @@
         
         tipoSocial = await servicio.ObtenerPorId(id, token);
         contextoEdicion = new EditContext(tipoSocial);
-        modalTitle = "Modificar TipoSocial";
+        modalTitle = "Modificar Tipo Social";
         modalButtonLabel = "Guardar Cambios";
         mostrarModal = true;
     }
@@ -298,7 +298,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas desactivar este registro de TipoSocial?",
+                    Text = "¿Deseas desactivar este registro de Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Desactivar",
@@ -329,7 +329,7 @@
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
                 {
                     Title = "¿Estás seguro?",
-                    Text = "¿Deseas Activar este registro de TipoSocial?",
+                    Text = "¿Deseas Activar este registro de Tipo Social?",
                     Icon = SweetAlertIcon.Warning,
                     ShowCancelButton = true,
                     ConfirmButtonText = "Sí, Activar",

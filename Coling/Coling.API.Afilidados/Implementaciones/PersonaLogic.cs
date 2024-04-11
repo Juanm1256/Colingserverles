@@ -148,5 +148,16 @@ namespace Coling.API.Afilidados.Implementaciones
             var personabyid = await contexto.Personas.FirstOrDefaultAsync(x => x.Id == id);
             return personabyid;
         }
+
+        public async Task<PerTelDir> ObtenerAllById(int id)
+        {
+            PerTelDir per = new PerTelDir();
+
+            per.personas = await contexto.Personas.FirstOrDefaultAsync(x => x.Id == id);
+            per.telefonos = await contexto.Telefonos.FirstOrDefaultAsync(x => x.Idpersona == id);
+            per.direccions = await contexto.Direccions.FirstOrDefaultAsync(x => x.Idpersona == id);
+
+            return per;
+        }
     }
 }

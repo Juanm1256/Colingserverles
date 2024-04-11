@@ -122,5 +122,19 @@ namespace Coling.Vista.Servicios.Curriculum
             }
             return estudio;
         }
+
+        public async Task<List<TipoEstudio>> ListarteEstadoActivo(string token)
+        {
+            string endPoint = "api/ListarTipoEstudioEstadoActivo";
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(endPoint);
+            List<TipoEstudio> result = new List<TipoEstudio>();
+            if (response.IsSuccessStatusCode)
+            {
+                string respuestaCuerpo = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<TipoEstudio>>(respuestaCuerpo);
+            }
+            return result;
+        }
     }
 }

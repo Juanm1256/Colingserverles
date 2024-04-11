@@ -18,6 +18,6 @@ namespace Coling.Vista.Servicios.Afiliados
         Task<bool> InsertarAll(PerTelDir registroperteldir, string token);
         Task<bool> Modificar(Persona personas, int id, string token);
         Task<bool> Eliminar(int id, string token);
-        Task<Persona> ObtenerPorId(int id, string token);
+        Task<PerTelDir> ObtenerPorId(int id, string token);
     }
 }

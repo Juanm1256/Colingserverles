@@ -21,7 +21,7 @@ namespace Coling.Utilitarios.Middleware
             var rolesClaim = (string?)context.Items["rolesclaim"];
             if (!EstaAutorizado(nombreFunction, rolesClaim))
             {
-                throw new Exception("Error: No esta autorizdo");
+                throw new Exception("Error: No esta autorizado");
             }
             await next(context);
         }
